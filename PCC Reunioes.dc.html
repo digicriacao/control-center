@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&amp;display=block" rel="stylesheet">
+<script src="./store.js"></script>
+</helmet>
+<div style="padding:24px 28px 48px;display:flex;flex-direction:column;gap:16px;font-family:'Poppins',system-ui,sans-serif;color:#1F2128;font-size:13px;max-width:1500px">
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:4px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;padding:3px">
+      <button onClick="{{ prevM }}" style="width:28px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">chevron_left</span></button>
+      <span style="font-size:13px;font-weight:600;text-transform:capitalize;min-width:128px;text-align:center">{{ mesLabel }}</span>
+      <button onClick="{{ nextM }}" style="width:28px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">chevron_right</span></button>
+    </div>
+    <button onClick="{{ goHoje }}" style="padding:8px 12px;border:1px solid #E5E7EB;border-radius:8px;background:#FFFFFF;font-size:12px;cursor:pointer">Hoje</button>
+    <div style="flex:1"></div>
+    <button onClick="{{ onNovaSerie }}" style="display:flex;align-items:center;gap:6px;padding:9px 14px;border:1px solid #DADDE2;border-radius:8px;background:#FFFFFF;font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">event_repeat</span>Reunião recorrente</button>
+    <button onClick="{{ onNova }}" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border:0;border-radius:8px;background:#E6175C;color:#FFFFFF;font-weight:600;font-size:12.5px;cursor:pointer;white-space:nowrap"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">add</span>Nova reunião</button>
+  </div>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1 1 640px;min-width:0;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr))">
+        <sc-for list="{{ weekDays }}" as="w"><div style="padding:10px 12px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#6B6F7A;border-bottom:1px solid #E5E7EB">{{ w }}</div></sc-for>
+        <sc-for list="{{ days }}" as="d" hint-placeholder-count="35">
+          <div onClick="{{ d.onNew }}" style="min-height:112px;padding:6px;border-right:1px solid #ECEEF1;border-bottom:1px solid #ECEEF1;background:{{ d.bg }};display:flex;flex-direction:column;gap:4px;cursor:pointer">
+            <span style="font-size:11.5px;font-weight:600;color:{{ d.color }};align-self:flex-start;padding:1px 6px;border-radius:10px;background:{{ d.numBg }}">{{ d.n }}</span>
+            <sc-for list="{{ d.itens }}" as="m">
+              <button onClick="{{ m.onOpen }}" title="{{ m.titulo }}" style="display:flex;align-items:center;gap:5px;padding:4px 6px;border:0;border-radius:4px;background:{{ m.bg }};color:{{ m.fg }};text-align:left;cursor:pointer;min-width:0;outline:{{ m.outline }}">
+                <span style="font-size:10px;font-weight:600;flex:none">{{ m.hora }}</span>
+                <span style="font-size:10.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">{{ m.titulo }}</span>
+                <sc-if value="{{ m.hasLink }}"><span style="font-family:'Material Symbols Outlined';font-size:12px;line-height:1;flex:none">videocam</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <aside style="flex:0 1 340px;min-width:290px;display:flex;flex-direction:column;gap:12px">
+      <sc-if value="{{ hasForm }}">
+        <div onClick="{{ onClose }}" style="position:fixed;inset:0;background:rgba(20,22,30,0.28);z-index:50"></div>
+        <div style="position:fixed;top:0;right:0;bottom:0;width:400px;max-width:100vw;overflow:auto;z-index:51;background:#FFFFFF;box-shadow:-12px 0 40px rgba(20,22,30,0.16);padding:22px 24px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px;font-weight:600;flex:1">{{ formTitle }}</span>
+            <button onClick="{{ onClose }}" style="width:28px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">close</span></button>
+          </div>
+          <sc-if value="{{ hasLinkNow }}">
+            <a href="{{ f.link }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 14px;border-radius:8px;background:#E6175C;color:#FFFFFF;font-size:13px;font-weight:600;text-decoration:none"><span style="font-family:'Material Symbols Outlined';font-size:19px;line-height:1">videocam</span>Entrar na reunião</a>
+          </sc-if>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Título
+            <input value="{{ f.titulo }}" onChange="{{ on.titulo }}" placeholder="Ex.: Alinhamento com o cliente" style="padding:9px 10px;border:1px solid {{ tituloBorder }};border-radius:6px;font-size:12.5px;font-weight:400;outline:none">
+          </label>
+          <sc-if value="{{ isSerie }}">
+            <div style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Repete toda
+              <div style="display:flex;gap:4px;flex-wrap:wrap">
+                <sc-for list="{{ diasOpts }}" as="o">
+                  <button onClick="{{ o.onClick }}" style="padding:6px 10px;border-radius:6px;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.color }};font-size:11.5px;font-weight:500;cursor:pointer">{{ o.l }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:10px">
+            <sc-if value="{{ isAvulsa }}">
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Data
+                <input type="date" value="{{ f.data }}" onChange="{{ on.data }}" style="padding:8px 10px;border:1px solid {{ dataBorder }};border-radius:6px;font-size:12.5px;font-weight:400">
+              </label>
+            </sc-if>
+            <sc-if value="{{ isSerie }}"><span></span></sc-if>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Horário
+              <input type="time" value="{{ f.hora }}" onChange="{{ on.hora }}" style="padding:8px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400">
+            </label>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Link da reunião
+            <input value="{{ f.link }}" onChange="{{ on.link }}" placeholder="Teams, Meet ou Zoom (https://…)" style="padding:9px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;outline:none">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Pauta / observações
+            <textarea value="{{ f.obs }}" onChange="{{ on.obs }}" rows="3" style="padding:9px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;outline:none;resize:vertical;line-height:1.5"></textarea>
+          </label>
+          <sc-if value="{{ isSerie }}"><span style="font-size:11px;color:#6B6F7A;line-height:1.5">As alterações valem para todas as ocorrências da série.</span></sc-if>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <button onClick="{{ onSave }}" style="padding:9px 18px;border:0;border-radius:8px;background:#E6175C;color:#FFFFFF;font-weight:600;font-size:12.5px;cursor:pointer">Salvar</button>
+            <sc-if value="{{ canSkip }}"><button onClick="{{ onSkip }}" style="padding:9px 12px;border:1px solid #DADDE2;border-radius:8px;background:#FFFFFF;font-size:12px;cursor:pointer">{{ skipLabel }}</button></sc-if>
+            <span style="flex:1"></span>
+            <sc-if value="{{ canDelete }}"><button onClick="{{ onDelete }}" style="border:0;background:transparent;color:#C4213B;font-size:12px;cursor:pointer;padding:0">{{ deleteLabel }}</button></sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:14px;font-weight:600;padding-bottom:4px">Próximas reuniões</span>
+        <sc-for list="{{ proximas }}" as="p">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #F0F1F4">
+            <button onClick="{{ p.onOpen }}" style="flex:1;min-width:0;display:flex;flex-direction:column;border:0;background:transparent;padding:0;text-align:left;cursor:pointer">
+              <span style="font-size:11px;font-weight:600;color:{{ p.whenColor }}">{{ p.quando }}</span>
+              <span style="font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.titulo }}</span>
+            </button>
+            <sc-if value="{{ p.hasLink }}"><a href="{{ p.link }}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:6px;background:#FDECF2;color:#E6175C;font-size:11.5px;font-weight:600;text-decoration:none;flex:none"><span style="font-family:'Material Symbols Outlined';font-size:15px;line-height:1">videocam</span>Entrar</a></sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ semProximas }}"><span style="font-size:11.5px;color:#9A9EA8">Nenhuma reunião nos próximos 14 dias.</span></sc-if>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:14px;font-weight:600;padding-bottom:4px">Reuniões recorrentes</span>
+        <sc-for list="{{ series }}" as="s">
+          <button onClick="{{ s.onOpen }}" style="display:flex;align-items:center;gap:10px;padding:8px 0;border:0;border-top:1px solid #F0F1F4;background:transparent;text-align:left;cursor:pointer">
+            <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:#E6175C">event_repeat</span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column">
+              <span style="font-size:12.5px;font-weight:500">{{ s.titulo }}</span>
+              <span style="font-size:11px;color:#6B6F7A">{{ s.quando }}</span>
+            </span>
+            <span style="font-size:10.5px;color:{{ s.linkColor }}">{{ s.linkTxt }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mes: null, form: null, erro: false };
+  componentDidMount() {
+    const init = () => {
+      if (!window.DigiStore) return void (this.t = setTimeout(init, 40));
+      this.unsub = window.DigiStore.subscribe(() => this.forceUpdate());
+      this.forceUpdate();
+    };
+    init();
+  }
+  componentWillUnmount() { this.unsub && this.unsub(); clearTimeout(this.t); }
+
+  renderVals() {
+    const S = window.DigiStore, st = this.state;
+    if (!S) return { weekDays: [], days: [], proximas: [], series: [], diasOpts: [], f: {}, on: {} };
+    const D = S.get(), t = S.today(), mes = st.mes || S.monthOf(t);
+    const DS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'], DC = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const isLink = l => /^https?:\/\//.test(l || '');
+    const openOcc = c => {
+      if (c.recorrente) { const r = D.recorrentes.find(x => x.id === c.rid); this.setState({ form: { kind: 'serie', ...r, semanas: r.semanas || (r.semana != null ? [r.semana] : []), occ: c.data }, erro: false }); }
+      else this.setState({ form: { kind: 'avulsa', ...D.reunioes.find(x => x.id === c.id) }, erro: false });
+    };
+    const f = st.form;
+    const [y, m] = mes.split('-').map(Number);
+    const first = new Date(y, m - 1, 1), lead = (first.getDay() + 6) % 7, nDays = new Date(y, m, 0).getDate();
+    const cells = Math.ceil((lead + nDays) / 7) * 7;
+    const start = S.addDays(-lead, mes + '-01');
+    const occ = S.compromissos(start, S.addDays(cells - 1, start)).filter(c => c.tipo === 'reuniao');
+    const days = [];
+    for (let i = 0; i < cells; i++) {
+      const k = S.addDays(i, start), inM = S.monthOf(k) === mes, isT = k === t;
+      days.push({
+        n: +k.slice(8, 10), bg: inM ? '#FFFFFF' : '#FAFAFB', color: isT ? '#FFFFFF' : inM ? '#1F2128' : '#B3B6BE', numBg: isT ? '#E6175C' : 'transparent',
+        itens: occ.filter(c => c.data === k).map(c => {
+          const sel = f && ((f.kind === 'serie' && f.id === c.rid && f.occ === k) || (f.kind === 'avulsa' && f.id === c.id));
+          return { hora: c.hora || '', titulo: c.titulo, hasLink: isLink(c.link), bg: c.recorrente ? '#FDECF2' : '#E6175C', fg: c.recorrente ? '#B80F47' : '#FFFFFF', outline: sel ? '2px solid #1F2128' : 'none', onOpen: e => { e.stopPropagation(); openOcc(c); } };
+        }),
+        onNew: () => this.setState({ form: { kind: 'avulsa', titulo: '', data: k, hora: '', link: '', obs: '' }, erro: false })
+      });
+    }
+    const proximas = S.compromissos(t, S.addDays(14)).filter(c => c.tipo === 'reuniao').slice(0, 10).map(c => ({
+      titulo: c.titulo, quando: (c.data === t ? 'Hoje' : c.data === S.addDays(1) ? 'Amanhã' : S.fmtLong(c.data)) + (c.hora ? ' · ' + c.hora : ''),
+      whenColor: c.data === t ? '#E6175C' : '#6B6F7A', hasLink: isLink(c.link), link: c.link || '', onOpen: () => openOcc(c)
+    }));
+    const series = D.recorrentes.filter(r => r.tipo === 'reuniao').map(r => {
+      const ss = r.semanas || (r.semana != null ? [r.semana] : []);
+      return { titulo: r.titulo, quando: 'Toda ' + ss.map(i => DS[i]).join(' e ') + (r.hora ? ' · ' + r.hora : ''), linkTxt: isLink(r.link) ? 'com link' : 'sem link', linkColor: isLink(r.link) ? '#1F7A3A' : '#9A9EA8', onOpen: () => this.setState({ form: { kind: 'serie', ...r, semanas: ss, occ: null }, erro: false }) };
+    });
+
+    const on = {};
+    ['titulo', 'data', 'hora', 'link', 'obs'].forEach(k => on[k] = e => this.setState({ form: { ...this.state.form, [k]: e.target.value } }));
+    const isSerie = !!f && f.kind === 'serie';
+    const diasOpts = [1, 2, 3, 4, 5, 6, 0].map(i => {
+      const onx = isSerie && f.semanas.includes(i);
+      return { l: DC[i], bg: onx ? '#FDECF2' : '#FFFFFF', border: onx ? '#E6175C' : '#DADDE2', color: onx ? '#B80F47' : '#4A4E58', onClick: () => this.setState({ form: { ...f, semanas: onx ? f.semanas.filter(x => x !== i) : [...f.semanas, i] } }) };
+    });
+
+    return {
+      mesLabel: S.monthLabel(mes), prevM: () => this.setState({ mes: S.shiftMonth(mes, -1) }), nextM: () => this.setState({ mes: S.shiftMonth(mes, 1) }), goHoje: () => this.setState({ mes: S.monthOf(t) }),
+      weekDays: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], days, proximas, semProximas: proximas.length === 0, series,
+      onNova: () => this.setState({ form: { kind: 'avulsa', titulo: '', data: t, hora: '', link: '', obs: '' }, erro: false }),
+      onNovaSerie: () => this.setState({ form: { kind: 'serie', titulo: '', semanas: [], hora: '', link: '', obs: '', occ: null }, erro: false }),
+      hasForm: !!f, f: f || {}, on, isSerie, isAvulsa: !!f && f.kind === 'avulsa', diasOpts,
+      formTitle: !f ? '' : isSerie ? (f.id ? (f.occ ? 'Série · ' + S.fmtLong(f.occ) : 'Reunião recorrente') : 'Nova reunião recorrente') : (f.id ? 'Reunião' : 'Nova reunião'),
+      hasLinkNow: !!f && isLink(f.link),
+      tituloBorder: st.erro && f && !(f.titulo || '').trim() ? '#C4213B' : '#DADDE2', dataBorder: st.erro && f && !f.data ? '#C4213B' : '#DADDE2',
+      onClose: () => this.setState({ form: null }),
+      onSave: () => {
+        if (!(f.titulo || '').trim() || (f.kind === 'avulsa' && !f.data) || (isSerie && !f.semanas.length)) return this.setState({ erro: true });
+        if (isSerie) { const p = { titulo: f.titulo.trim(), semanas: f.semanas.slice().sort(), hora: f.hora, link: (f.link || '').trim(), obs: f.obs || '' }; if (f.id) S.salvarRecorrente(f.id, { ...p, semana: undefined }); else S.addRecorrente(p); }
+        else S.salvarReuniao({ id: f.id, titulo: f.titulo.trim(), data: f.data, hora: f.hora, link: (f.link || '').trim(), obs: f.obs || '' });
+        this.setState({ form: null, erro: false });
+      },
+      canSkip: isSerie && !!f.id && !!f.occ, skipLabel: f && f.occ ? 'Não haverá em ' + S.fmt(f.occ) : '',
+      onSkip: () => { S.pularOcorrencia(f.id, f.occ); this.setState({ form: null }); },
+      canDelete: !!f && !!f.id, deleteLabel: isSerie ? 'Excluir série' : 'Excluir',
+      onDelete: () => {
+        if (!confirm(isSerie ? 'Excluir todas as ocorrências de "' + f.titulo + '"?' : 'Excluir esta reunião?')) return;
+        if (isSerie) S.excluirRecorrente(f.id); else S.removeReuniao(f.id);
+        this.setState({ form: null });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Noto+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&amp;display=block" rel="stylesheet">
+<script src="./store.js"></script>
+<style>
+@media print {
+  @page { size: 1600px 900px; margin: 0; }
+  html, body { background: #F3F5F8 !important; }
+  body * { visibility: hidden !important; }
+  [data-onepager], [data-onepager] * { visibility: visible !important; }
+  [data-onepager] { position: fixed !important; left: 0 !important; top: 0 !important; transform: scale(var(--op-print-scale, 1)) !important; transform-origin: 0 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</helmet>
+<div style="padding:24px 28px 48px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;font-family:'Poppins',system-ui,sans-serif;color:#1F2128;font-size:13px">
+
+  <div style="flex:1 1 640px;min-width:0;display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:15px;font-weight:600;white-space:nowrap">{{ viewTitle }}</span>
+      <span style="font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:4px;background:{{ statusBg }};color:{{ statusFg }}">{{ viewStatus }}</span>
+      <div style="flex:1"></div>
+      <sc-if value="{{ isSaved }}">
+        <button onClick="{{ onCopy }}" style="display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid #DADDE2;border-radius:8px;background:#FFFFFF;font-size:12px;cursor:pointer;white-space:nowrap"><span style="font-family:'Material Symbols Outlined';font-size:17px;line-height:1">content_copy</span>{{ copyLabel }}</button>
+        <button onClick="{{ onPrint }}" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:0;border-radius:8px;background:#1F2128;color:#FFFFFF;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap"><span style="font-family:'Material Symbols Outlined';font-size:17px;line-height:1">picture_as_pdf</span>Exportar PDF</button>
+      </sc-if>
+    </div>
+
+    <div ref="{{ wrapRef }}" style="width:100%;height:{{ wrapH }};overflow:hidden;border-radius:10px;border:1px solid #E5E7EB;background:#F3F5F8">
+      <div data-onepager="1" ref="{{ docRef }}" style="width:1600px;min-height:900px;transform:scale({{ scale }});transform-origin:0 0;background:#F3F5F8;padding:32px 48px 28px;display:flex;flex-direction:column;gap:16px;font-family:'Noto Sans',system-ui,sans-serif;color:#1D2B3A">
+        <div style="display:flex;align-items:center;gap:22px">
+          <sc-if value="{{ hasLogo }}"><img src="{{ logo }}" alt="Prudential" style="height:44px;width:auto;object-fit:contain"></sc-if>
+          <sc-if value="{{ noLogo }}"><span style="font-family:Georgia,'Times New Roman',serif;font-size:30px;font-weight:700;color:#0D2240;letter-spacing:-0.01em">Prudential</span></sc-if>
+          <span style="width:1px;height:30px;background:#C9D1DC"></span>
+          <span style="font-size:22px;font-weight:700;letter-spacing:0.22em;color:#0B78C2">PARCERIAS</span>
+          <span style="flex:1"></span>
+          <span style="font-size:20px;font-weight:500;letter-spacing:0.2em;color:#5E6B7A;white-space:nowrap">CONTROLE · {{ doc.mesUp }}</span>
+        </div>
+        <div style="height:2px;background:#D9DEE6;position:relative"><div style="position:absolute;left:0;top:0;height:3px;width:200px;background:#E3B44B"></div></div>
+        <div style="display:flex;align-items:flex-end;gap:20px">
+          <h1 style="margin:0;font-size:40px;font-weight:800;letter-spacing:-0.01em;color:#0D2240;flex:1;line-height:1.1">{{ doc.titulo }}</h1>
+          <span style="font-size:16px;color:#5E6B7A;padding-bottom:6px">atualizado em {{ doc.atualizadoFmt }}</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:440px minmax(0,1fr);gap:20px">
+          <div style="background:#E3B44B;border-radius:14px;padding:16px 26px;display:flex;align-items:center;gap:20px">
+            <span style="font-size:84px;font-weight:800;line-height:0.9;color:#0D2240;letter-spacing:-0.04em">{{ doc.aberta }}</span>
+            <span style="font-size:23px;font-weight:700;line-height:1.2;color:#0D2240;text-wrap:pretty">Quantidade aberta para pedido: {{ doc.aberta }} peças</span>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E3E7ED;border-radius:14px;padding:16px 24px;display:flex;flex-direction:column;gap:10px;justify-content:center">
+            <span style="font-size:15px;font-weight:700;letter-spacing:0.16em;color:#5E6B7A">TOTAL DE PEÇAS EM PAUTA</span>
+            <div style="display:flex;height:34px;border-radius:6px;overflow:hidden;background:#EEF1F5">
+              <div style="width:{{ doc.wGeral }};background:#0D2240;color:#FFFFFF;font-size:16px;font-weight:700;display:flex;align-items:center;padding:0 14px">{{ doc.geral }}</div>
+              <div style="width:{{ doc.wIg }};background:#0B78C2;color:#FFFFFF;font-size:16px;font-weight:700;display:flex;align-items:center;padding:0 14px">{{ doc.ig }}</div>
+              <div style="width:{{ doc.wAberta }};background:repeating-linear-gradient(135deg,#E3B44B 0 12px,#EDCB7C 12px 24px);color:#0D2240;font-size:16px;font-weight:700;display:flex;align-items:center;padding:0 14px">{{ doc.aberta }}</div>
+            </div>
+            <div style="display:flex;gap:28px;font-size:16px;flex-wrap:wrap">
+              <span style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:2px;background:#0B78C2"></span>Instagram: <strong>{{ doc.ig }} peças</strong></span>
+              <span style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:2px;background:#0D2240"></span>Geral: <strong>{{ doc.geral }} peças</strong></span>
+              <span style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:2px;background:#E3B44B"></span>Quantidade aberta para pedido: <strong>{{ doc.aberta }} peças</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:20px;flex:1">
+          <div style="background:#FFFFFF;border:1px solid #E3E7ED;border-radius:14px;padding:18px 22px;display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:14px;font-weight:800;letter-spacing:0.14em;color:#0B78C2">RÉGUAS</span>
+            <sc-for list="{{ doc.reguas }}" as="g">
+              <sc-if value="{{ g.single }}"><div style="font-size:15px;line-height:1.4">{{ g.titulo }}: {{ g.det }}</div></sc-if>
+              <sc-if value="{{ g.multi }}">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:15px;line-height:1.4">{{ g.titulo }}: {{ g.n }} peças</span>
+                  <sc-for list="{{ g.linhas }}" as="l"><span style="font-size:13px;color:#5E6B7A">- {{ l.txt }} · <span style="font-weight:700;color:{{ l.fg }}">{{ l.label }}</span></span></sc-for>
+                </div>
+              </sc-if>
+            </sc-for>
+            <div style="height:1px;background:#E3E7ED;margin:4px 0"></div>
+            <span style="font-size:14px;font-weight:800;letter-spacing:0.14em;color:#0B78C2">AVULSO</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 18px">
+              <sc-for list="{{ doc.avulsos }}" as="a">
+                <div style="display:flex;flex-direction:column;gap:3px">
+                  <span style="font-size:14.5px;font-weight:700;color:#0D2240;line-height:1.3">{{ a.titulo }}</span>
+                  <span style="font-size:12.5px;color:#5E6B7A;line-height:1.4">- {{ a.det }}</span>
+                  <sc-if value="{{ a.showBadge }}"><span style="font-size:10.5px;font-weight:700;letter-spacing:0.08em;color:{{ a.fg }}">{{ a.labelUp }}</span></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF;border:1px solid #E3E7ED;border-radius:14px;padding:18px 22px;display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ doc.grupos }}" as="g">
+              <span style="font-size:14px;font-weight:800;letter-spacing:0.14em;color:#0B78C2;text-transform:uppercase;line-height:1.4">{{ g.titulo }}</span>
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ g.linhas }}" as="l">
+                  <div style="display:flex;align-items:center;gap:12px;padding:5px 0;border-bottom:1px solid #E9EDF2">
+                    <span style="flex:1;font-size:14.5px;line-height:1.3">{{ l.txt }}</span>
+                    <span style="font-size:10.5px;font-weight:700;letter-spacing:0.08em;padding:3px 7px;border-radius:4px;background:{{ l.bg }};color:{{ l.fg }};white-space:nowrap">{{ l.labelUp }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background:#FFFFFF;border:1px solid #E3E7ED;border-radius:14px;padding:18px 22px;display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:14px;font-weight:800;letter-spacing:0.14em;color:#0B78C2;margin-top:0">NEWS</span>
+            <sc-for list="{{ doc.news }}" as="g">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:15px;font-weight:700;color:#0D2240">- {{ g.titulo }}</span>
+                <sc-for list="{{ g.linhas }}" as="l">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <span style="flex:1;font-size:13.5px;color:#5E6B7A;line-height:1.35">{{ l.txt }}</span>
+                    <span style="font-size:10.5px;font-weight:700;letter-spacing:0.08em;padding:3px 7px;border-radius:4px;background:{{ l.bg }};color:{{ l.fg }};white-space:nowrap">{{ l.labelUp }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+            <div style="height:1px;background:#E3E7ED;margin:8px 0 4px"></div>
+            <span style="font-size:14px;font-weight:800;letter-spacing:0.14em;color:#0B78C2">CALENDÁRIO INSTAGRAM</span>
+            <sc-for list="{{ doc.instagram }}" as="l">
+              <div style="display:flex;align-items:center;gap:12px;padding:5px 0;border-bottom:1px solid #E9EDF2">
+                <span style="flex:1;font-size:14.5px;line-height:1.3">{{ l.txt }}</span>
+                <sc-if value="{{ l.showBadge }}"><span style="font-size:10.5px;font-weight:700;letter-spacing:0.08em;padding:3px 7px;border-radius:4px;background:{{ l.bg }};color:{{ l.fg }};white-space:nowrap">{{ l.labelUp }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ doc.showFooter }}">
+          <div style="display:flex;gap:28px;align-items:center;background:#FFFFFF;border:1px solid #E3E7ED;border-radius:14px;padding:12px 24px;font-size:14px;flex-wrap:wrap">
+            <sc-if value="{{ doc.mostrarSemana }}">
+              <span style="font-size:13px;font-weight:800;letter-spacing:0.14em;color:#0B78C2">SEMANA {{ doc.semanaFmt }}</span>
+              <sc-for list="{{ doc.stats }}" as="s"><span><strong style="color:#0D2240">{{ s.n }}</strong> <span style="color:#5E6B7A">{{ s.l }}</span></span></sc-for>
+            </sc-if>
+            <sc-if value="{{ doc.hasObs }}"><span style="flex:1 1 400px;color:#1D2B3A;line-height:1.45"><strong style="color:#0D2240">Observações:</strong> {{ doc.obs }}</span></sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <aside style="flex:0 1 320px;min-width:280px;display:flex;flex-direction:column;gap:12px">
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:14px;font-weight:600">Gerar One-Pager</span>
+      <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Semana de referência
+        <select value="{{ semana }}" onChange="{{ onSemana }}" style="padding:9px 10px;border:1px solid #DADDE2;border-radius:6px;background:#FFFFFF;font-size:12.5px;font-weight:400">
+          <sc-for list="{{ semanaOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+        </select>
+      </label>
+      <button onClick="{{ onGerar }}" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border:0;border-radius:8px;background:#E6175C;color:#FFFFFF;font-weight:600;font-size:12.5px;cursor:pointer"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">auto_awesome</span>Gerar One-Pager</button>
+      <span style="font-size:11px;color:#6B6F7A;line-height:1.5;text-wrap:pretty">Reúne automaticamente as demandas, o calendário do Instagram e o saldo do contrato do mês da semana escolhida. Só usa o que está cadastrado.</span>
+    </div>
+
+    <sc-if value="{{ isSaved }}">
+      <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+        <span style="font-size:14px;font-weight:600">Revisar</span>
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Título
+          <input value="{{ op.titulo }}" onChange="{{ onTitulo }}" style="padding:9px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;outline:none">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Observações importantes
+          <textarea value="{{ op.obs }}" onChange="{{ onObs }}" rows="3" placeholder="Aparece no rodapé do One-Pager" style="padding:9px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;outline:none;resize:vertical;line-height:1.5"></textarea>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer"><input type="checkbox" checked="{{ op.mostrarSemana }}" onChange="{{ onToggleSemana }}">Mostrar resumo da semana no rodapé</label>
+        <button onClick="{{ onAtualizar }}" style="padding:8px 12px;border:1px solid #DADDE2;border-radius:8px;background:#FFFFFF;font-size:12px;cursor:pointer">Atualizar com os dados atuais</button>
+        <div style="display:flex;gap:8px">
+          <button onClick="{{ onEnviado }}" style="flex:1;padding:9px 12px;border:0;border-radius:8px;background:{{ enviadoBg }};color:{{ enviadoFg }};font-size:12px;font-weight:600;cursor:pointer">{{ enviadoLabel }}</button>
+          <button onClick="{{ onExcluir }}" style="padding:9px 12px;border:0;border-radius:8px;background:transparent;color:#C4213B;font-size:12px;cursor:pointer">Excluir</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:14px;font-weight:600;padding-bottom:4px">One-Pagers anteriores</span>
+      <button onClick="{{ onLive }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:0;border-radius:6px;background:{{ liveBg }};text-align:left;cursor:pointer">
+        <span style="font-family:'Material Symbols Outlined';font-size:17px;line-height:1;color:#E6175C">visibility</span>
+        <span style="flex:1;font-size:12px;font-weight:500">Prévia com dados atuais</span>
+      </button>
+      <sc-for list="{{ historico }}" as="h">
+        <button onClick="{{ h.onClick }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:0;border-radius:6px;background:{{ h.bg }};text-align:left;cursor:pointer">
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column">
+            <span style="font-size:12px;font-weight:500">Semana de {{ h.semana }}</span>
+            <span style="font-size:10.5px;color:#6B6F7A">gerado em {{ h.criado }}</span>
+          </span>
+          <span style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px;background:{{ h.sbg }};color:{{ h.sfg }}">{{ h.status }}</span>
+        </button>
+      </sc-for>
+      <sc-if value="{{ semHistorico }}"><span style="font-size:11.5px;color:#9A9EA8;padding:4px 10px">Nenhum One-Pager gerado ainda.</span></sc-if>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:14px 18px;display:flex;flex-direction:column;gap:8px">
+      <span style="font-size:12px;font-weight:600">Logo da Prudential</span>
+      <label style="font-size:12px;color:#E6175C;cursor:pointer">{{ logoLabel }}<input type="file" accept="image/*" onChange="{{ onLogo }}" style="display:none"></label>
+    </div>
+  </aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sel: null, semana: null, scale: 0.5, docH: 900, copied: false };
+  wrapRef = React.createRef();
+  docRef = React.createRef();
+  componentDidMount() {
+    const init = () => {
+      if (!window.DigiStore) return void (this.t = setTimeout(init, 40));
+      this.unsub = window.DigiStore.subscribe(() => this.forceUpdate());
+      this.forceUpdate();
+    };
+    init();
+    this.ro = new ResizeObserver(() => this.measure());
+    setTimeout(() => { this.wrapRef.current && this.ro.observe(this.wrapRef.current); this.docRef.current && this.ro.observe(this.docRef.current); this.measure(); }, 0);
+  }
+  measure() {
+    const w = this.wrapRef.current, d = this.docRef.current; if (!w || !d) return;
+    const scale = w.clientWidth / 1600, docH = d.offsetHeight;
+    if (Math.abs(scale - this.state.scale) > 0.001 || docH !== this.state.docH) this.setState({ scale, docH });
+  }
+  componentWillUnmount() { this.unsub && this.unsub(); clearTimeout(this.t); this.ro && this.ro.disconnect(); }
+
+  renderVals() {
+    const S = window.DigiStore, st = this.state;
+    const empty = { reguas: [], avulsos: [], grupos: [], news: [], instagram: [], stats: [] };
+    if (!S) return { doc: empty, semanaOpts: [], historico: [], op: {}, wrapRef: this.wrapRef, docRef: this.docRef, scale: st.scale, wrapH: '450px' };
+    const D = S.get(), t = S.today(), ops = D.onepagers || [];
+    const semana = st.semana || S.weekStart(t);
+    const op = ops.find(o => o.id === st.sel) || null;
+    const mesDaSemana = w => S.monthOf(S.addDays(3, w));
+    const snap = op ? op.snapshot : S.snapshotOP(mesDaSemana(semana));
+    const semRef = op ? op.semana : semana;
+    const TONE = { ok: ['#1F7A4D', '#E4F3EA'], err: ['#C0392B', '#FBE6E4'], info: ['#0B78C2', 'transparent'] };
+    const b = x => { const [label, tone] = x || ['', 'info']; return { label, labelUp: label.toUpperCase(), fg: TONE[tone][0], bg: TONE[tone][1], showBadge: !!x }; };
+    const ddmm = d => d.slice(8, 10) + '/' + d.slice(5, 7);
+    const mesNome = S.monthLabel(snap.mes).split(' ')[0];
+    const tot = Math.max(1, snap.limite, snap.geral + snap.ig + Math.max(0, snap.aberta));
+    const grp = g => g.multi ? { titulo: g.titulo, multi: true, single: false, n: g.linhas.length, linhas: g.linhas.map(l => ({ txt: l.txt, ...b(l.badge) })) } : { titulo: g.titulo, multi: false, single: true, det: g.det, ...b(g.badge) };
+    const titulo = (op && op.titulo) || ('Total Pedidos Prudential ' + mesNome.charAt(0).toUpperCase() + mesNome.slice(1));
+    const mostrarSemana = op ? op.mostrarSemana !== false : true;
+    const obs = (op && op.obs || '').trim();
+    const sm = snap.semana;
+    const doc = {
+      titulo, mesUp: S.monthLabel(snap.mes).toUpperCase(), atualizadoFmt: ddmm(snap.atualizado),
+      geral: snap.geral, ig: snap.ig, aberta: snap.aberta,
+      wGeral: (snap.geral / tot * 100) + '%', wIg: (snap.ig / tot * 100) + '%', wAberta: (Math.max(0, snap.aberta) / tot * 100) + '%',
+      reguas: snap.reguas.map(grp),
+      avulsos: snap.avulsos.map(g => { const x = grp(g); return { ...x, showBadge: x.label !== 'Concluído' }; }),
+      grupos: snap.grupos.map(grp),
+      news: snap.news.map(g => g.multi ? { titulo: g.titulo, linhas: g.linhas.map(l => ({ txt: l.txt, ...b(l.badge) })) } : { titulo: g.titulo, linhas: [{ txt: g.det, ...b(g.badge) }] }),
+      instagram: snap.instagram.map(l => ({ txt: l.txt, ...b(l.badge) })),
+      mostrarSemana, obs, hasObs: !!obs, showFooter: mostrarSemana || !!obs,
+      semanaFmt: ddmm(semRef) + ' A ' + ddmm(S.addDays(6, semRef)),
+      stats: [[sm.concluidas, 'peças concluídas'], [sm.enviadas, 'enviadas ao cliente'], [sm.producao, 'em produção'], [sm.aprovacao, 'em aprovação'], [sm.pendencias, 'pendências'], [sm.proximas.length, 'entregas nos próximos 7 dias']].map(([n, l]) => ({ n, l }))
+    };
+
+    const weeks = []; let w = S.weekStart(S.addDays(7, t));
+    for (let i = 0; i < 10; i++) { weeks.push(w); w = S.addDays(-7, w); }
+    const upd = p => op && S.salvarOP({ id: op.id, ...p });
+    const toText = () => {
+      const L = [doc.titulo + ' — atualizado em ' + doc.atualizadoFmt, '', 'Peças em pauta: Geral ' + doc.geral + ' · Instagram ' + doc.ig + ' · Quantidade aberta para pedido: ' + doc.aberta, ''];
+      const sec = (nome, gs) => { if (!gs.length) return; L.push(nome.toUpperCase()); gs.forEach(g => { if (g.multi || g.linhas) { L.push(g.titulo); (g.linhas || []).forEach(l => L.push('  - ' + l.txt + (l.label ? ' (' + l.label + ')' : ''))); } else L.push(g.titulo + ': ' + g.det + (g.label ? ' (' + g.label + ')' : '')); }); L.push(''); };
+      sec('Réguas', doc.reguas); sec('Avulso', doc.avulsos); doc.grupos.forEach(g => sec(g.titulo, [g])); sec('News', doc.news);
+      if (doc.instagram.length) { L.push('CALENDÁRIO INSTAGRAM'); doc.instagram.forEach(l => L.push(l.txt + (l.showBadge ? ' (' + l.label + ')' : ''))); L.push(''); }
+      if (obs) L.push('Observações: ' + obs);
+      return L.join('\n');
+    };
+    const AP = { Rascunho: ['#FFF3DC', '#9A6200'], Enviado: ['#E3F4E8', '#1F7A3A'] };
+    const fmtTs = ts => { const d = new Date(ts); return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+
+    return {
+      wrapRef: this.wrapRef, docRef: this.docRef, scale: st.scale, wrapH: Math.ceil(st.docH * st.scale) + 'px',
+      doc, isSaved: !!op, op: op || {},
+      viewTitle: op ? 'One-Pager · semana de ' + S.fmt(op.semana) : 'Prévia com dados atuais',
+      viewStatus: op ? op.status : 'Ao vivo', statusBg: op ? AP[op.status][0] : '#E8EEFC', statusFg: op ? AP[op.status][1] : '#2F5BD3',
+      semana, semanaOpts: weeks.map(x => ({ v: x, l: S.fmt(x) + ' a ' + S.fmt(S.addDays(6, x)) + (x === S.weekStart(t) ? ' (atual)' : '') })),
+      onSemana: e => this.setState({ semana: e.target.value, sel: null }),
+      onGerar: () => { const id = S.salvarOP({ semana, mes: mesDaSemana(semana), status: 'Rascunho', titulo: '', obs: '', mostrarSemana: true, snapshot: S.snapshotOP(mesDaSemana(semana)) }); this.setState({ sel: id }); },
+      onTitulo: e => upd({ titulo: e.target.value }), onObs: e => upd({ obs: e.target.value }),
+      onToggleSemana: e => upd({ mostrarSemana: e.target.checked }),
+      onAtualizar: () => upd({ snapshot: S.snapshotOP(op.mes) }),
+      onEnviado: () => upd({ status: op.status === 'Enviado' ? 'Rascunho' : 'Enviado', enviadoEm: Date.now() }),
+      enviadoLabel: op && op.status === 'Enviado' ? 'Enviado ✓ (desfazer)' : 'Marcar como enviado', enviadoBg: op && op.status === 'Enviado' ? '#E3F4E8' : '#1F2128', enviadoFg: op && op.status === 'Enviado' ? '#1F7A3A' : '#FFFFFF',
+      onExcluir: () => { if (confirm('Excluir este One-Pager do histórico?')) { S.excluirOP(op.id); this.setState({ sel: null }); } },
+      onPrint: () => { const d = this.docRef.current, h = d ? d.offsetHeight : 900; document.documentElement.style.setProperty('--op-print-scale', String(Math.min(1, 900 / h))); window.print(); },
+      onCopy: () => { navigator.clipboard.writeText(toText()).then(() => { this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 1800); }); },
+      copyLabel: st.copied ? 'Copiado' : 'Copiar texto para e-mail',
+      onLive: () => this.setState({ sel: null }), liveBg: op ? 'transparent' : '#FDECF2',
+      historico: ops.map(o => ({ semana: S.fmt(o.semana), criado: fmtTs(o.ts), status: o.status, sbg: AP[o.status][0], sfg: AP[o.status][1], bg: op && op.id === o.id ? '#FDECF2' : 'transparent', onClick: () => this.setState({ sel: o.id }) })),
+      semHistorico: ops.length === 0,
+      hasLogo: !!D.settings.logoOP, noLogo: !D.settings.logoOP, logo: D.settings.logoOP || '',
+      logoLabel: D.settings.logoOP ? 'Trocar imagem do logo' : 'Enviar imagem do logo (PNG/SVG)',
+      onLogo: e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => S.setSettings({ logoOP: r.result }); r.readAsDataURL(f); }
+    };
+  }
+}
+</script>
+</body>
+</html>

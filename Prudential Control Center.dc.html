@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&amp;display=block" rel="stylesheet">
+<script src="./store.js"></script>
+<style>
+html,body{margin:0;height:100%;background:#F4F5F7}
+*{box-sizing:border-box}
+a{color:#E6175C}a:hover{color:#B80F47}
+input,button,select,textarea{font:inherit;color:inherit}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D5D8DE;border-radius:6px;border:2px solid #F4F5F7}
+</style>
+</helmet>
+<div style="display:flex;height:100vh;font-family:'Poppins',system-ui,sans-serif;color:#1F2128;background:#F4F5F7;font-size:13px">
+
+  <aside style="width:{{ sideW }};flex:none;background:#FFFFFF;border-right:1px solid #E5E7EB;padding:18px 12px 14px;display:flex;flex-direction:column;gap:18px;overflow:auto;transition:width .15s">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px">
+      <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="font-weight:700;font-size:30px;letter-spacing:-0.045em;color:#E6175C;line-height:0.9">digi</div>
+          <div style="font-size:9.5px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#6B6F7A">Prudential Control Center</div>
+        </div>
+      </sc-if>
+      <button onClick="{{ toggleSide }}" title="Recolher menu" style="width:26px;height:26px;border:1px solid #E5E7EB;border-radius:6px;background:#FFFFFF;cursor:pointer;display:grid;place-items:center;color:#6B6F7A;padding:0;flex:none"><span style="font-family:'Material Symbols Outlined';font-size:16px;line-height:1">{{ sideIcon }}</span></button>
+    </div>
+    <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="4">
+      <nav style="display:flex;flex-direction:column;gap:2px">
+        <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:#8A8E98;padding:0 12px 6px">{{ g.titulo }}</div>
+        </sc-if>
+        <sc-for list="{{ g.itens }}" as="n" hint-placeholder-count="3">
+          <button onClick="{{ n.onClick }}" title="{{ n.label }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:0;border-radius:6px;background:{{ n.bg }};color:{{ n.color }};cursor:pointer;font-size:12.5px;font-weight:{{ n.weight }};text-align:left;white-space:nowrap">
+            <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;width:18px;overflow:hidden;flex:none">{{ n.icon }}</span>
+            <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}">
+              <span style="flex:1">{{ n.label }}</span>
+              <span style="font-size:10.5px;color:{{ n.badgeColor }}">{{ n.badge }}</span>
+            </sc-if>
+          </button>
+        </sc-for>
+      </nav>
+    </sc-for>
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+      <sc-if value="{{ dataOpen }}">
+        <div style="border:1px solid #E5E7EB;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;background:#FFFFFF">
+          <div style="font-size:11px;color:#6B6F7A;line-height:1.45;text-wrap:pretty">Os dados ficam salvos neste navegador. Exporte um backup para guardar ou levar para outro computador.</div>
+          <button onClick="{{ doExport }}" style="text-align:left;border:0;background:#F4F5F7;border-radius:6px;padding:7px 10px;cursor:pointer;font-size:12px">Exportar backup (.json)</button>
+          <label style="text-align:left;background:#F4F5F7;border-radius:6px;padding:7px 10px;cursor:pointer;font-size:12px">Importar backup<input type="file" accept=".json" onChange="{{ doImport }}" style="display:none"></label>
+          <sc-if value="{{ isExemplo }}">
+            <button onClick="{{ doClear }}" style="text-align:left;border:0;background:#FDECF2;color:#B80F47;border-radius:6px;padding:7px 10px;cursor:pointer;font-size:12px">Apagar dados de exemplo</button>
+          </sc-if>
+          <button onClick="{{ doRestore }}" style="text-align:left;border:0;background:transparent;color:#6B6F7A;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:11px">Restaurar pedidos de novembro</button>
+        </div>
+      </sc-if>
+      <div style="border-top:1px solid #E5E7EB;padding:12px 4px 0;display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;border-radius:50%;background:#E6175C;color:#FFFFFF;font-size:11px;font-weight:600;display:grid;place-items:center;flex:none">IC</div>
+        <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}">
+          <div style="min-width:0;flex:1;display:flex;flex-direction:column">
+            <span style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Isabella Coelho</span>
+            <span style="font-size:10.5px;color:#6B6F7A">Atendimento · Prudential</span>
+          </div>
+          <button onClick="{{ toggleData }}" title="Dados e backup" style="width:28px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;color:#6B6F7A;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">database</span></button>
+        </sc-if>
+      </div>
+    </div>
+  </aside>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <header style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:16px;padding:0 24px;position:relative;z-index:20">
+      <span style="font-size:16px;font-weight:700;letter-spacing:0.01em;text-transform:uppercase;white-space:nowrap">{{ pageTitle }}</span>
+      <div style="flex:1"></div>
+      <div style="position:relative;width:340px;max-width:40vw">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:#8A8E98">search</span>
+        <input value="{{ q }}" onChange="{{ onQ }}" onFocus="{{ onQFocus }}" placeholder="Buscar demandas, peças, News, réguas…" style="width:100%;padding:9px 12px 9px 34px;border:1px solid #DADDE2;border-radius:8px;background:#FFFFFF;font-size:12.5px;outline:none">
+        <sc-if value="{{ showResults }}">
+          <div style="position:absolute;top:44px;left:0;right:0;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;box-shadow:0 12px 32px rgba(20,22,30,0.12);padding:6px;max-height:420px;overflow:auto">
+            <sc-for list="{{ results }}" as="r">
+              <button onClick="{{ r.onClick }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border:0;border-radius:6px;background:transparent;cursor:pointer;text-align:left" style-hover="background:#F4F5F7">
+                <span style="width:8px;height:8px;border-radius:50%;background:{{ r.dot }};flex:none"></span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column">
+                  <span style="font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.nome }}</span>
+                  <span style="font-size:11px;color:#6B6F7A">{{ r.sub }}</span>
+                </span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ noResults }}"><div style="padding:14px;color:#6B6F7A;font-size:12px">Nenhum resultado.</div></sc-if>
+          </div>
+        </sc-if>
+      </div>
+      <div style="position:relative">
+        <button onClick="{{ toggleBell }}" title="Alertas" style="width:38px;height:38px;border:1px solid #E5E7EB;border-radius:50%;background:#FFFFFF;cursor:pointer;display:grid;place-items:center;position:relative;padding:0">
+          <span style="font-family:'Material Symbols Outlined';font-size:20px;line-height:1">notifications</span>
+          <sc-if value="{{ hasAlerts }}"><span style="position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#E6175C;color:#FFFFFF;font-size:10px;font-weight:600;display:grid;place-items:center">{{ alertCount }}</span></sc-if>
+        </button>
+        <sc-if value="{{ bellOpen }}">
+          <div style="position:absolute;top:48px;right:0;width:380px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;box-shadow:0 12px 32px rgba(20,22,30,0.12);max-height:480px;overflow:auto">
+            <div style="padding:14px 16px;border-bottom:1px solid #ECEEF1;font-weight:600;font-size:13px">Alertas <span style="color:#6B6F7A;font-weight:400">· {{ alertCount }}</span></div>
+            <sc-for list="{{ alerts }}" as="a">
+              <button onClick="{{ a.onClick }}" style="width:100%;display:flex;gap:12px;padding:12px 16px;border:0;border-bottom:1px solid #F0F1F4;background:transparent;cursor:pointer;text-align:left" style-hover="background:#FAFAFB">
+                <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:{{ a.fg }};background:{{ a.bg }};padding:3px 7px;border-radius:4px;height:fit-content;white-space:nowrap">{{ a.tipo }}</span>
+                <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                  <span style="font-size:12.5px;font-weight:500">{{ a.txt }}</span>
+                  <span style="font-size:11px;color:#6B6F7A">{{ a.sub }}</span>
+                </span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ noAlerts }}"><div style="padding:18px 16px;color:#6B6F7A;font-size:12px">Nenhum alerta no momento.</div></sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </header>
+
+    <main onClick="{{ closePops }}" style="flex:1;min-height:0;overflow:auto">
+      <sc-if value="{{ ready }}">
+        <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+          <dc-import name="PCC Dashboard" go="{{ go }}" hint-size="100%,900px"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isDemandas }}">
+          <dc-import name="PCC Demandas" go="{{ go }}" open-id="{{ openId }}" on-opened="{{ clearOpen }}" hint-size="100%,900px"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isContrato }}">
+          <dc-import name="PCC Contrato" go="{{ go }}" hint-size="100%,900px"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isInstagram }}">
+          <dc-import name="PCC Instagram" go="{{ go }}" hint-size="100%,900px"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isOnePager }}">
+          <dc-import name="PCC OnePager" go="{{ go }}" hint-size="100%,900px"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isReguas }}">
+          <dc-import name="PCC Reguas" go="{{ go }}" hint-size="100%,900px"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isReunioes }}">
+          <dc-import name="PCC Reunioes" go="{{ go }}" hint-size="100%,900px"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isPending }}">
+          <div style="padding:28px">
+            <div style="max-width:720px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:28px 30px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'Material Symbols Outlined';font-size:22px;line-height:1;color:#E6175C">{{ pending.icon }}</span>
+                <span style="font-size:17px;font-weight:600">{{ pending.label }}</span>
+                <span style="font-size:10.5px;font-weight:600;color:#9A6200;background:#FFF3DC;padding:3px 8px;border-radius:4px">{{ pending.etapa }}</span>
+              </div>
+              <div style="font-size:13px;color:#4A4E58;line-height:1.6;text-wrap:pretty">{{ pending.desc }}</div>
+              <div style="font-size:12px;color:#6B6F7A">Este módulo vai usar a mesma base de dados das demandas e do contrato.</div>
+            </div>
+          </div>
+        </sc-if>
+      </sc-if>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  MODS = [
+    ['Operação', [['dashboard', 'Dashboard', 'space_dashboard'], ['demandas', 'Pauta e Demandas', 'view_kanban'], ['reunioes', 'Reuniões', 'event'], ['contrato', 'Controle Contratual', 'fact_check']]],
+    ['Conteúdo', [['instagram', 'Instagram', 'photo_camera'], ['news', 'News', 'mail'], ['reguas', 'Réguas', 'timeline'], ['brindes', 'Brindes', 'redeem']]],
+    ['Relatórios', [['onepager', 'One-Pager', 'article'], ['reporte', 'Reporte Semanal', 'monitoring']]],
+    ['Recursos', [['links', 'Arquivos e Links', 'link']]]
+  ];
+  PENDING = {
+    news: ['Etapa 4', 'Edições da Conecta PEM e da Prudential Partners News, com status (incluindo "Não haverá edição", que não conta como atraso), histórico e atalhos para o SharePoint e o Gerador de News.'],
+    brindes: ['Etapa 4', 'Cadastro inicial de brindes (AirTags, cartões personalizados e outros) com quantidade, fornecedor, prazos e status.'],
+    reporte: ['Etapa 5', 'Preenchimento manual dos resultados semanais do Instagram, comparativo com a semana anterior, gráficos de evolução e lembretes da rotina de sexta-feira.'],
+    links: ['Etapa 4', 'Central de links da operação (SharePoint, Gerador de News, apresentações, briefings), com categorias, edição e exclusão.']
+  };
+  state = { route: localStorage.getItem('digi-pcc-route') || 'dashboard', openId: null, q: '', qOpen: false, bellOpen: false, dataOpen: false, side: true, ready: !!window.DigiStore };
+
+  componentDidMount() {
+    const init = () => {
+      if (!window.DigiStore) return void (this.t = setTimeout(init, 40));
+      this.unsub = window.DigiStore.subscribe(() => this.forceUpdate());
+      this.setState({ ready: true });
+    };
+    init();
+  }
+  componentWillUnmount() { this.unsub && this.unsub(); clearTimeout(this.t); }
+  go = (route, openId = null) => { localStorage.setItem('digi-pcc-route', route); this.setState({ route, openId, q: '', qOpen: false, bellOpen: false }); };
+
+  renderVals() {
+    const s = this.state, S = window.DigiStore, all = this.MODS.flatMap(g => g[1]);
+    const cur = all.find(m => m[0] === s.route) || all[0];
+    const exp = s.side;
+    let alerts = [], results = [], badges = {}, isExemplo = false;
+    if (s.ready && S) {
+      const d = S.get();
+      isExemplo = !!d.exemplo;
+      badges.demandas = d.demandas.filter(x => !S.G.fechado.includes(x.status)).length;
+      const al = S.alertas();
+      badges.dashboard = '';
+      alerts = al.map(a => ({ ...a, fg: a.nivel === 'erro' ? '#C4213B' : '#9A6200', bg: a.nivel === 'erro' ? '#FDE6EA' : '#FFF3DC', onClick: () => a.id ? this.go('demandas', a.id) : this.go(a.mod || 'dashboard') }));
+      const q = s.q.trim().toLowerCase();
+      if (q) results = d.demandas.filter(x => [x.nome, x.categoria, x.tipo, x.respInterno, x.status, x.obs].join(' ').toLowerCase().includes(q)).slice(0, 10)
+        .map(x => ({ nome: x.nome, sub: x.categoria + ' · ' + S.statusMeta(x.status).curto + ' · entrega ' + S.fmt(x.entrega), dot: S.statusMeta(x.status).fg, onClick: () => this.go('demandas', x.id) }));
+    }
+    const navGroups = this.MODS.map(([titulo, itens]) => ({
+      titulo, itens: itens.map(([id, label, icon]) => {
+        const on = s.route === id;
+        return { label, icon, bg: on ? '#E6175C' : 'transparent', color: on ? '#FFFFFF' : '#1F2128', weight: on ? 600 : 400, badge: badges[id] || (this.PENDING[id] ? '' : ''), badgeColor: on ? '#FFFFFF' : '#8A8E98', onClick: () => this.go(id) };
+      })
+    }));
+    const p = this.PENDING[cur[0]];
+    return {
+      ready: s.ready, navGroups, expanded: exp, sideW: exp ? '236px' : '64px', sideIcon: exp ? 'keyboard_double_arrow_left' : 'keyboard_double_arrow_right',
+      toggleSide: () => this.setState({ side: !s.side, dataOpen: false }),
+      pageTitle: cur[1], go: this.go,
+      isDashboard: cur[0] === 'dashboard', isDemandas: cur[0] === 'demandas', isContrato: cur[0] === 'contrato', isInstagram: cur[0] === 'instagram', isOnePager: cur[0] === 'onepager', isReguas: cur[0] === 'reguas', isReunioes: cur[0] === 'reunioes', isPending: !!p,
+      pending: p ? { label: cur[1], icon: cur[2], etapa: p[0] + ' · em desenvolvimento', desc: p[1] } : {},
+      openId: s.openId, clearOpen: () => this.setState({ openId: null }),
+      q: s.q, onQ: e => this.setState({ q: e.target.value, qOpen: true }), onQFocus: () => this.setState({ qOpen: true, bellOpen: false }),
+      showResults: s.qOpen && !!s.q.trim(), results, noResults: results.length === 0,
+      alerts, alertCount: alerts.length, hasAlerts: alerts.length > 0, noAlerts: alerts.length === 0,
+      bellOpen: s.bellOpen, toggleBell: () => this.setState({ bellOpen: !s.bellOpen, qOpen: false }),
+      closePops: () => (s.qOpen || s.bellOpen) && this.setState({ qOpen: false, bellOpen: false }),
+      dataOpen: s.dataOpen, toggleData: () => this.setState({ dataOpen: !s.dataOpen }), isExemplo,
+      doExport: () => { const b = new Blob([S.exportar()], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'digi-prudential-backup-' + S.today() + '.json'; a.click(); },
+      doImport: e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { try { S.importar(t); alert('Backup importado.'); } catch (err) { alert('Não foi possível importar: ' + err.message); } }); },
+      doClear: () => { if (confirm('Apagar todas as demandas e reuniões de exemplo? As configurações do contrato são mantidas.')) S.limparExemplo(); },
+      doRestore: () => { if (confirm('Substituir os dados atuais pelo levantamento original de novembro?')) S.restaurarExemplo(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

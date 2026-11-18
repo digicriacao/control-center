@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&amp;display=block" rel="stylesheet">
+<script src="./store.js"></script>
+</helmet>
+<div style="padding:24px 28px 48px;display:flex;flex-direction:column;gap:18px;font-family:'Poppins',system-ui,sans-serif;color:#1F2128;font-size:13px;max-width:1440px">
+
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:4px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;padding:3px">
+      <button onClick="{{ prevM }}" style="width:28px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">chevron_left</span></button>
+      <span style="font-size:13px;font-weight:600;text-transform:capitalize;min-width:128px;text-align:center">{{ mesLabel }}</span>
+      <button onClick="{{ nextM }}" style="width:28px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">chevron_right</span></button>
+    </div>
+    <div style="flex:1"></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#6B6F7A">Contabilizar peça
+      <select value="{{ regra }}" onChange="{{ onRegra }}" style="padding:8px 10px;border:1px solid #DADDE2;border-radius:6px;background:#FFFFFF;font-size:12px;color:#1F2128">
+        <sc-for list="{{ regraOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+      </select>
+    </label>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+    <sc-for list="{{ totais }}" as="k" hint-placeholder-count="4">
+      <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:14px 18px;display:flex;flex-direction:column;gap:4px">
+        <span style="font-size:11.5px;color:#6B6F7A;font-weight:500">{{ k.label }}</span>
+        <span style="font-size:26px;font-weight:600;letter-spacing:-0.02em;color:{{ k.color }}">{{ k.valor }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">
+    <sc-for list="{{ cards }}" as="c" hint-placeholder-count="3">
+      <div style="background:#FFFFFF;border:1px solid {{ c.border }};border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:'Material Symbols Outlined';font-size:20px;line-height:1;color:#E6175C">{{ c.icon }}</span>
+          <span style="font-size:14px;font-weight:600;flex:1">{{ c.label }}</span>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6B6F7A">limite
+            <input type="number" min="0" value="{{ c.limite }}" onChange="{{ c.onLimite }}" style="width:52px;padding:4px 6px;border:1px solid #DADDE2;border-radius:5px;font-size:12px">
+          </label>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <span style="font-size:36px;font-weight:600;letter-spacing:-0.03em;line-height:1">{{ c.usado }}</span>
+          <span style="font-size:13px;color:#6B6F7A;white-space:nowrap">de {{ c.limite }} {{ c.unidade }}</span>
+          <span style="flex:1"></span>
+          <span style="font-size:13px;font-weight:600;color:{{ c.pctColor }}">{{ c.pct }}%</span>
+        </div>
+        <div style="height:10px;border-radius:5px;background:#F0F1F4;display:flex;overflow:hidden">
+          <div style="width:{{ c.wUsado }};background:{{ c.cor }}"></div>
+          <div style="width:{{ c.wPrev }};background:{{ c.corPrev }}"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+          <div style="display:flex;flex-direction:column"><span style="font-size:10.5px;color:#6B6F7A">Utilizadas</span><span style="font-size:15px;font-weight:600">{{ c.usado }}</span></div>
+          <div style="display:flex;flex-direction:column"><span style="font-size:10.5px;color:#6B6F7A">Previstas</span><span style="font-size:15px;font-weight:600">{{ c.previsto }}</span></div>
+          <div style="display:flex;flex-direction:column"><span style="font-size:10.5px;color:#6B6F7A">Restantes</span><span style="font-size:15px;font-weight:600;color:{{ c.restColor }}">{{ c.restante }}</span></div>
+        </div>
+        <sc-if value="{{ c.hasAlerta }}">
+          <div style="font-size:11.5px;font-weight:500;color:{{ c.alertaFg }};background:{{ c.alertaBg }};padding:8px 10px;border-radius:6px;text-wrap:pretty">{{ c.alerta }}</div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;overflow:hidden">
+    <div style="display:flex;gap:4px;padding:12px 16px 0;border-bottom:1px solid #E5E7EB">
+      <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="4">
+        <button onClick="{{ tb.onClick }}" style="padding:8px 14px 10px;border:0;border-bottom:2px solid {{ tb.line }};background:transparent;font-size:12.5px;font-weight:{{ tb.weight }};color:{{ tb.color }};cursor:pointer">{{ tb.label }} <span style="color:#9A9EA8;font-weight:400">{{ tb.n }}</span></button>
+      </sc-for>
+    </div>
+    <div style="overflow:auto">
+      <div style="min-width:820px">
+        <div style="display:grid;grid-template-columns:minmax(240px,2fr) 160px 90px 120px 190px;gap:12px;padding:10px 18px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#6B6F7A;border-bottom:1px solid #ECEEF1">
+          <span>Demanda</span><span>Status</span><span>Conta</span><span>Situação</span><span>Consome contrato?</span>
+        </div>
+        <sc-for list="{{ linhas }}" as="l" hint-placeholder-count="6">
+          <sc-if value="{{ l.isGrupo }}">
+            <div style="padding:10px 18px 6px;background:#FAFAFB;border-bottom:1px solid #ECEEF1;display:flex;gap:8px;align-items:baseline">
+              <span style="font-size:12px;font-weight:600">{{ l.titulo }}</span>
+              <span style="font-size:11px;color:#6B6F7A">{{ l.sub }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ l.isItem }}">
+            <div style="display:grid;grid-template-columns:minmax(240px,2fr) 160px 90px 120px 190px;gap:12px;padding:10px 18px;border-bottom:1px solid #F0F1F4;align-items:center">
+              <button onClick="{{ l.onOpen }}" style="border:0;background:transparent;padding:0;text-align:left;cursor:pointer;min-width:0;display:flex;flex-direction:column;gap:1px">
+                <span style="font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:{{ l.deco }}">{{ l.nome }}</span>
+                <span style="font-size:11px;color:#6B6F7A">{{ l.tipo }} · entrega {{ l.entregaFmt }}</span>
+              </button>
+              <span style="font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:4px;background:{{ l.sbg }};color:{{ l.sfg }};justify-self:start;white-space:nowrap">{{ l.statusCurto }}</span>
+              <span style="font-size:12px">{{ l.conta }}</span>
+              <span style="font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:4px;background:{{ l.sitBg }};color:{{ l.sitFg }};justify-self:start">{{ l.sitLabel }}</span>
+              <select value="{{ l.modo }}" onChange="{{ l.onModo }}" style="padding:6px 8px;border:1px solid #DADDE2;border-radius:6px;background:#FFFFFF;font-size:12px">
+                <option value="auto">Automático (regra)</option>
+                <option value="sim">Sim — exceção</option>
+                <option value="nao">Não consome</option>
+              </select>
+            </div>
+          </sc-if>
+        </sc-for>
+        <sc-if value="{{ semLinhas }}"><div style="padding:32px;text-align:center;color:#6B6F7A;font-size:12px">{{ semLinhasTxt }}</div></sc-if>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:12px">
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:14px;font-weight:600">Histórico mensal</div>
+      <div style="display:grid;grid-template-columns:minmax(120px,1fr) repeat(4,72px);gap:8px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#6B6F7A;padding-bottom:6px;border-bottom:1px solid #ECEEF1">
+        <span>Mês</span><span>Gerais</span><span>Feed</span><span>Stories</span><span>Total</span>
+      </div>
+      <sc-for list="{{ historico }}" as="h">
+        <button onClick="{{ h.onClick }}" style="display:grid;grid-template-columns:minmax(120px,1fr) repeat(4,72px);gap:8px;font-size:12px;padding:6px 0;border:0;border-bottom:1px solid #F0F1F4;background:{{ h.bg }};text-align:left;cursor:pointer">
+          <span style="text-transform:capitalize;font-weight:{{ h.weight }}">{{ h.label }}</span>
+          <span style="color:{{ h.gc }}">{{ h.g }}</span><span style="color:{{ h.fc }}">{{ h.f }}</span><span style="color:{{ h.sc }}">{{ h.s }}</span><span>{{ h.t }}</span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:14px;font-weight:600">Regras aplicadas</div>
+      <sc-for list="{{ regras }}" as="r">
+        <div style="display:flex;gap:10px;font-size:12px;line-height:1.5;color:#4A4E58;text-wrap:pretty">
+          <span style="width:5px;height:5px;border-radius:50%;background:#E6175C;flex:none;margin-top:8px"></span><span>{{ r }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mes: null, tab: 'geral' };
+  componentDidMount() {
+    const init = () => {
+      if (!window.DigiStore) return void (this.t = setTimeout(init, 40));
+      this.unsub = window.DigiStore.subscribe(() => this.forceUpdate());
+      this.forceUpdate();
+    };
+    init();
+  }
+  componentWillUnmount() { this.unsub && this.unsub(); clearTimeout(this.t); }
+
+  renderVals() {
+    const S = window.DigiStore;
+    if (!S) return { totais: [], cards: [], tabs: [], linhas: [], historico: [], regras: [], regraOpts: [] };
+    const D = S.get(), t = S.today(), mes = this.state.mes || S.monthOf(t), go = this.props.go || (() => { });
+    const C = S.contrato(mes), L = D.settings.limites;
+    const SIT = { contabilizada: ['Contabilizada', '#1F7A3A', '#E3F4E8'], prevista: ['Prevista', '#2F5BD3', '#E8EEFC'], nao: ['Não consome', '#6B6F7A', '#EEF0F3'] };
+    const META = { geral: ['Peças gerais', 'inventory_2', 'peças'], feed: ['Instagram · Feed', 'grid_view', 'feeds'], stories: ['Instagram · Stories', 'amp_stories', 'unidades'] };
+
+    const cards = ['geral', 'feed', 'stories'].map(b => {
+      const x = C[b], over = x.comprometido > x.limite, near = !over && x.comprometido >= x.limite * 0.8, overUsed = x.usado > x.limite;
+      const lim = Math.max(x.limite, x.comprometido) || 1;
+      return {
+        label: META[b][0], icon: META[b][1], unidade: META[b][2], limite: x.limite, usado: x.usado, previsto: x.previsto, restante: x.restante, pct: x.pct,
+        pctColor: overUsed ? '#C4213B' : '#1F2128', restColor: x.restante < 0 ? '#C4213B' : '#1F2128',
+        wUsado: (x.usado / lim * 100) + '%', wPrev: (x.previsto / lim * 100) + '%', cor: over ? '#C4213B' : '#E6175C', corPrev: over ? '#F2A7B4' : '#F7B3C9',
+        border: over ? '#F2A7B4' : '#E5E7EB',
+        hasAlerta: over || near,
+        alerta: over ? 'Limite ultrapassado: ' + x.comprometido + ' ' + META[b][2] + ' comprometidas para ' + x.limite + ' contratadas. Revise ou registre como exceção.' : 'Atenção: ' + x.comprometido + ' de ' + x.limite + ' ' + META[b][2] + ' já comprometidas (contabilizadas + previstas).',
+        alertaFg: over ? '#C4213B' : '#9A6200', alertaBg: over ? '#FDE6EA' : '#FFF3DC',
+        onLimite: e => { const v = Math.max(0, parseInt(e.target.value) || 0); S.setSettings({ limites: { ...L, [b]: v } }); }
+      };
+    });
+    const totais = [
+      { label: 'Contratadas no mês', valor: C.total.limite },
+      { label: 'Utilizadas', valor: C.total.usado },
+      { label: 'Previstas', valor: C.total.previsto },
+      { label: 'Restantes', valor: C.total.restante, color: C.total.restante < 0 ? '#C4213B' : '#1F2128' }
+    ].map(k => ({ color: '#1F2128', ...k }));
+
+    const row = ({ d, sit }) => {
+      const m = S.statusMeta(d.status), b = S.bucketOf(d);
+      return {
+        isItem: true, nome: d.nome, tipo: d.tipo, entregaFmt: S.fmt(d.entrega), statusCurto: m.curto, sbg: m.bg, sfg: m.fg,
+        deco: d.status === 'Cancelado' ? 'line-through' : 'none',
+        conta: sit === 'nao' ? '—' : b === 'stories' ? 'campanha' : (+d.qtd || 0) + (+d.qtd === 1 ? ' peça' : ' peças'),
+        sitLabel: SIT[sit][0], sitFg: SIT[sit][1], sitBg: SIT[sit][2], modo: d.contrato.modo || 'auto',
+        onModo: e => S.setContratoModo(d.id, e.target.value), onOpen: () => go('demandas', d.id)
+      };
+    };
+    const tab = this.state.tab;
+    let linhas = [];
+    if (tab === 'stories') {
+      Object.values(C.stories.grupos).forEach(g => {
+        const nome = g[0].d.contrato.campanha || g[0].d.nome, cont = g.some(x => x.sit === 'contabilizada');
+        linhas.push({ isGrupo: true, titulo: 'Campanha: ' + nome, sub: '1 unidade · ' + g.length + (g.length === 1 ? ' demanda' : ' demandas') + ' · ' + (cont ? 'contabilizada' : 'prevista') });
+        g.forEach(x => linhas.push(row(x)));
+      });
+      const fora = C.stories.itens.filter(x => x.sit === 'nao');
+      if (fora.length) { linhas.push({ isGrupo: true, titulo: 'Fora do contrato', sub: 'canceladas ou marcadas como "não consome"' }); fora.forEach(x => linhas.push(row(x))); }
+    } else if (tab === 'excecoes') {
+      linhas = D.demandas.filter(d => S.mesRef(d) === mes && (d.contrato.modo !== 'auto' || d.status === 'Cancelado')).map(d => row({ d, sit: S.situacao(d) }));
+    } else {
+      const ord = { contabilizada: 0, prevista: 1, nao: 2 };
+      linhas = C[tab].itens.slice().sort((a, b) => ord[a.sit] - ord[b.sit]).map(row);
+    }
+    const nEx = D.demandas.filter(d => S.mesRef(d) === mes && (d.contrato.modo !== 'auto' || d.status === 'Cancelado')).length;
+    const TABS = [['geral', 'Peças gerais', C.geral.itens.length], ['feed', 'Feed', C.feed.itens.length], ['stories', 'Stories', C.stories.itens.length], ['excecoes', 'Exceções e cancelamentos', nEx]];
+
+    const months = [...new Set(D.demandas.map(S.mesRef).filter(Boolean).concat(S.monthOf(t)))].sort().reverse();
+    const historico = months.map(m => {
+      const c = S.contrato(m), col = x => x.usado > x.limite ? '#C4213B' : '#1F2128';
+      return { label: S.monthLabel(m), g: c.geral.usado + '/' + c.geral.limite, f: c.feed.usado + '/' + c.feed.limite, s: c.stories.usado + '/' + c.stories.limite, t: c.total.usado + '/' + c.total.limite, gc: col(c.geral), fc: col(c.feed), sc: col(c.stories), bg: m === mes ? '#FDECF2' : 'transparent', weight: m === mes ? 600 : 400, onClick: () => this.setState({ mes: m }) };
+    });
+
+    return {
+      mesLabel: S.monthLabel(mes), prevM: () => this.setState({ mes: S.shiftMonth(mes, -1) }), nextM: () => this.setState({ mes: S.shiftMonth(mes, 1) }),
+      regra: D.settings.regra, regraOpts: Object.entries(S.REGRAS).map(([v, l]) => ({ v, l: l.charAt(0).toLowerCase() + l.slice(1) })), onRegra: e => S.setSettings({ regra: e.target.value }),
+      totais, cards,
+      tabs: TABS.map(([id, label, n]) => ({ label, n, line: tab === id ? '#E6175C' : 'transparent', color: tab === id ? '#1F2128' : '#6B6F7A', weight: tab === id ? 600 : 400, onClick: () => this.setState({ tab: id }) })),
+      linhas, semLinhas: linhas.length === 0, semLinhasTxt: tab === 'excecoes' ? 'Nenhuma exceção ou cancelamento neste mês.' : 'Nenhuma demanda nesta categoria no mês.',
+      historico,
+      regras: [
+        'O mês de cada demanda é definido pela data de entrega, ou pelo mês de referência quando preenchido.',
+        'Peças gerais e Instagram têm saldos separados. No Instagram, Feed (' + L.feed + ') e Stories (' + L.stories + ') também são independentes.',
+        'Feed: peça única, carrossel, reels, GIF e trend contam 1 cada.',
+        'Stories: demandas com o mesmo nome de campanha no mês contam como 1 unidade, independentemente do número de telas.',
+        'Uma peça só é contabilizada quando atinge a etapa escolhida acima. Antes disso, aparece como prevista.',
+        'Canceladas saem do saldo, a não ser que sejam marcadas como exceção ("Sim — exceção").',
+        'Demandas só de planejamento, sem produção de material, devem ser marcadas como "Não consome".',
+        'Cada mês mantém seu próprio saldo; nada é apagado na virada do mês.'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

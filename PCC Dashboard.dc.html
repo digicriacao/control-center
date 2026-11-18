@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&amp;display=block" rel="stylesheet">
+<script src="./store.js"></script>
+</helmet>
+<div style="padding:24px 28px 48px;display:flex;flex-direction:column;gap:22px;font-family:'Poppins',system-ui,sans-serif;color:#1F2128;font-size:13px;max-width:1440px">
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:4px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;padding:3px">
+      <button onClick="{{ prevM }}" style="width:28px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">chevron_left</span></button>
+      <span style="font-size:13px;font-weight:600;text-transform:capitalize;min-width:128px;text-align:center">{{ mesLabel }}</span>
+      <button onClick="{{ nextM }}" style="width:28px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">chevron_right</span></button>
+    </div>
+    <span style="font-size:12px;color:#6B6F7A">{{ hojeLabel }}</span>
+    <div style="flex:1"></div>
+    <button onClick="{{ goDemandas }}" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border:0;border-radius:8px;background:#E6175C;color:#FFFFFF;font-weight:600;font-size:12.5px;cursor:pointer"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">view_kanban</span>Abrir pauta</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px">
+    <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="6">
+      <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:8px;color:#6B6F7A;font-size:11.5px;font-weight:500">
+          <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:{{ k.iconColor }}">{{ k.icon }}</span>{{ k.label }}
+        </div>
+        <div style="font-size:28px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;color:{{ k.color }}">{{ k.valor }}</div>
+        <div style="font-size:11px;color:#6B6F7A">{{ k.sub }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <section style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:baseline;gap:10px">
+      <h2 style="margin:0;font-size:17px;font-weight:600">Minha semana</h2>
+      <span style="font-size:12px;color:#6B6F7A">{{ semanaLabel }}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+      <sc-for list="{{ semana }}" as="col" hint-placeholder-count="6">
+        <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;min-height:150px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:#E6175C">{{ col.icon }}</span>
+            <span style="font-size:13px;font-weight:600;flex:1">{{ col.titulo }}</span>
+            <span style="font-size:11px;font-weight:600;min-width:22px;height:20px;padding:0 6px;border-radius:10px;background:#F4F5F7;display:grid;place-items:center">{{ col.count }}</span>
+          </div>
+          <sc-for list="{{ col.items }}" as="it">
+            <button onClick="{{ it.onClick }}" style="display:flex;align-items:center;gap:10px;padding:7px 0;border:0;border-top:1px solid #F0F1F4;background:transparent;text-align:left;cursor:{{ it.cursor }}">
+              <span style="width:7px;height:7px;border-radius:50%;background:{{ it.dot }};flex:none"></span>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column">
+                <span style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.nome }}</span>
+                <span style="font-size:10.5px;color:#6B6F7A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.sub }}</span>
+              </span>
+              <span style="font-size:11px;font-weight:500;color:{{ it.rightColor }};white-space:nowrap">{{ it.right }}</span>
+            </button>
+          </sc-for>
+          <sc-if value="{{ col.vazio }}"><div style="font-size:11.5px;color:#9A9EA8;padding-top:4px">{{ col.vazioTxt }}</div></sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:12px">
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:14px;font-weight:600;flex:1">Contrato do mês</span>
+        <button onClick="{{ goContrato }}" style="border:0;background:transparent;color:#E6175C;font-size:12px;font-weight:500;cursor:pointer">Ver controle</button>
+      </div>
+      <sc-for list="{{ buckets }}" as="b" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <span style="font-size:12.5px;font-weight:500;flex:1">{{ b.label }}</span>
+            <span style="font-size:12px"><strong style="font-weight:600">{{ b.usado }}</strong> <span style="color:#6B6F7A">de {{ b.limite }} · {{ b.restante }} disponíveis</span></span>
+          </div>
+          <div style="height:10px;border-radius:5px;background:#F0F1F4;display:flex;overflow:hidden">
+            <div style="width:{{ b.wUsado }};background:{{ b.cor }}"></div>
+            <div style="width:{{ b.wPrev }};background:{{ b.corPrev }}"></div>
+          </div>
+          <div style="font-size:10.5px;color:{{ b.notaCor }}">{{ b.nota }}</div>
+        </div>
+      </sc-for>
+      <div style="display:flex;gap:16px;font-size:10.5px;color:#6B6F7A">
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#E6175C"></span>Contabilizadas</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#F7B3C9"></span>Previstas (em pauta ou produção)</span>
+      </div>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:14px;font-weight:600">Demandas do mês por status</div>
+      <sc-for list="{{ statusBars }}" as="s" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:140px minmax(0,1fr) 28px;gap:10px;align-items:center">
+          <span style="font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.label }}</span>
+          <div style="height:8px;border-radius:4px;background:#F4F5F7"><div style="height:100%;width:{{ s.w }};border-radius:4px;background:{{ s.fg }}"></div></div>
+          <span style="font-size:11.5px;font-weight:600;text-align:right">{{ s.n }}</span>
+        </div>
+      </sc-for>
+      <sc-if value="{{ semStatus }}"><div style="font-size:12px;color:#9A9EA8">Nenhuma demanda neste mês.</div></sc-if>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">
+    <sc-for list="{{ listas }}" as="col" hint-placeholder-count="3">
+      <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:{{ col.iconColor }}">{{ col.icon }}</span>
+          <span style="font-size:13px;font-weight:600;flex:1">{{ col.titulo }}</span>
+          <span style="font-size:11px;font-weight:600;color:{{ col.iconColor }}">{{ col.count }}</span>
+        </div>
+        <sc-for list="{{ col.items }}" as="it">
+          <button onClick="{{ it.onClick }}" style="display:flex;align-items:center;gap:10px;padding:7px 0;border:0;border-top:1px solid #F0F1F4;background:transparent;text-align:left;cursor:pointer">
+            <span style="width:7px;height:7px;border-radius:50%;background:{{ it.dot }};flex:none"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column">
+              <span style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.nome }}</span>
+              <span style="font-size:10.5px;color:#6B6F7A">{{ it.sub }}</span>
+            </span>
+            <span style="font-size:11px;font-weight:500;color:{{ it.rightColor }};white-space:nowrap">{{ it.right }}</span>
+          </button>
+        </sc-for>
+        <sc-if value="{{ col.vazio }}"><div style="font-size:11.5px;color:#9A9EA8">{{ col.vazioTxt }}</div></sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:12px">
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:#E6175C">groups</span>
+        <span style="font-size:13px;font-weight:600;flex:1">Próximas reuniões</span>
+        <button onClick="{{ goReunioes }}" style="border:0;background:transparent;color:#E6175C;font-size:12px;font-weight:500;cursor:pointer">Ver calendário</button>
+      </div>
+      <sc-for list="{{ reunioes }}" as="r">
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #F0F1F4">
+          <span style="font-size:11px;font-weight:600;width:84px;flex:none">{{ r.quando }}</span>
+          <span style="flex:1;font-size:12px">{{ r.titulo }}</span>
+          <sc-if value="{{ r.hasLink }}"><a href="{{ r.link }}" target="_blank" rel="noopener" style="font-size:11px;font-weight:600;color:#E6175C;text-decoration:none">Entrar</a></sc-if>
+          <sc-if value="{{ r.recorrente }}"><span style="font-size:10px;color:#6B6F7A;background:#F4F5F7;padding:2px 6px;border-radius:4px">recorrente</span></sc-if>
+          <sc-if value="{{ r.manual }}"><button onClick="{{ r.onRemove }}" title="Remover" style="border:0;background:transparent;cursor:pointer;color:#9A9EA8;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:16px;line-height:1">close</span></button></sc-if>
+        </div>
+      </sc-for>
+      <div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid #F0F1F4;flex-wrap:wrap">
+        <input value="{{ nr.titulo }}" onChange="{{ onNr.titulo }}" placeholder="Nova reunião" style="flex:1 1 160px;min-width:0;padding:8px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12px;outline:none">
+        <input type="date" value="{{ nr.data }}" onChange="{{ onNr.data }}" style="padding:7px 8px;border:1px solid #DADDE2;border-radius:6px;font-size:12px">
+        <input type="time" value="{{ nr.hora }}" onChange="{{ onNr.hora }}" style="padding:7px 8px;border:1px solid #DADDE2;border-radius:6px;font-size:12px">
+        <button onClick="{{ addReuniao }}" style="padding:8px 14px;border:0;border-radius:6px;background:#1F2128;color:#FFFFFF;font-size:12px;font-weight:500;cursor:pointer">Adicionar</button>
+      </div>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:#E6175C">event_repeat</span>
+        <span style="font-size:13px;font-weight:600;flex:1">Compromissos recorrentes</span>
+      </div>
+      <sc-for list="{{ recorrentes }}" as="r">
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #F0F1F4">
+          <span style="font-size:11px;font-weight:600;width:150px;flex:none;color:#E6175C">{{ r.quando }}</span>
+          <span style="flex:1;font-size:12px">{{ r.titulo }}</span>
+          <span style="font-size:11px;color:#6B6F7A">próx. {{ r.prox }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mes: null, nr: { titulo: '', data: '', hora: '' } };
+  componentDidMount() {
+    const init = () => {
+      if (!window.DigiStore) return void (this.t = setTimeout(init, 40));
+      this.unsub = window.DigiStore.subscribe(() => this.forceUpdate());
+      this.forceUpdate();
+    };
+    init();
+  }
+  componentWillUnmount() { this.unsub && this.unsub(); clearTimeout(this.t); }
+
+  renderVals() {
+    const S = window.DigiStore;
+    if (!S) return { kpis: [], semana: [], buckets: [], statusBars: [], listas: [], reunioes: [], recorrentes: [], nr: {}, onNr: {} };
+    const D = S.get(), t = S.today(), mes = this.state.mes || S.monthOf(t), go = this.props.go || (() => { });
+    const open = id => () => go('demandas', id);
+    const ativos = D.demandas.filter(d => S.mesRef(d) === mes && d.status !== 'Cancelado');
+    const sum = a => a.reduce((n, d) => n + (+d.qtd || 0), 0);
+    const C = S.contrato(mes), L = D.settings.limites;
+    const kpis = [
+      { label: 'Peças contratadas', icon: 'contract', valor: C.total.limite, sub: L.geral + ' gerais · ' + L.feed + ' feed · ' + L.stories + ' stories' },
+      { label: 'Cadastradas na pauta', icon: 'playlist_add_check', valor: sum(ativos), sub: ativos.length + ' demandas no mês' },
+      { label: 'Concluídas', icon: 'task_alt', valor: sum(ativos.filter(d => d.status === 'Concluído')), sub: sum(ativos.filter(d => d.status === 'Peça enviada')) + ' enviadas aguardando conclusão' },
+      { label: 'Em produção', icon: 'brush', valor: sum(ativos.filter(d => S.G.producao.includes(d.status))), sub: 'texto, DA, motion e ajustes' },
+      { label: 'Aguardando aprovação', icon: 'hourglass_top', valor: ativos.filter(d => S.G.aprovacao.includes(d.status)).length, sub: 'textos e peças com o cliente' },
+      { label: 'Disponíveis no contrato', icon: 'inventory_2', valor: C.total.restante, sub: C.total.previsto + ' previstas ainda não contabilizadas', color: C.total.restante < 0 ? '#C4213B' : '#1F2128' }
+    ].map(k => ({ color: '#1F2128', iconColor: '#E6175C', ...k }));
+
+    const ws = S.weekStart(t), we = S.addDays(6, ws);
+    const item = (d, right, rightColor) => ({ nome: d.nome, sub: S.statusMeta(d.status).curto + (d.respInterno ? ' · ' + d.respInterno : '') + ' · ' + d.categoria, dot: S.statusMeta(d.status).fg, right: right ?? S.fmt(d.entrega), rightColor: rightColor || '#6B6F7A', onClick: open(d.id), cursor: 'pointer' });
+    const byDue = (a, b) => (a.entrega || '9999').localeCompare(b.entrega || '9999');
+    const all = D.demandas;
+    const comp = S.compromissos(ws, we);
+    const cItem = c => ({ nome: c.titulo, sub: S.fmtLong(c.data) + (c.hora ? ' · ' + c.hora : '') + (c.recorrente ? ' · recorrente' : ''), dot: c.data < t ? '#B3B6BE' : '#E6175C', right: c.data === t ? 'Hoje' : c.data < t ? 'Passou' : S.fmt(c.data), rightColor: c.data === t ? '#E6175C' : '#6B6F7A', onClick: () => { }, cursor: 'default' });
+    const col = (titulo, icon, items, vazioTxt) => ({ titulo, icon, items, count: items.length, vazio: items.length === 0, vazioTxt });
+    const semana = [
+      col('Entregas da semana', 'local_shipping', all.filter(d => d.entrega >= ws && d.entrega <= we && d.status !== 'Cancelado').sort(byDue).map(d => item(d, S.fmtLong(d.entrega).split(',')[0], S.atrasada(d) ? '#C4213B' : d.entrega === t ? '#E6175C' : '#6B6F7A')), 'Sem entregas nesta semana.'),
+      col('Textos para aprovação', 'rate_review', all.filter(d => d.status === 'Texto em aprovação').sort(byDue).map(d => item(d, S.diasNoStatus(d) + 'd', S.parada(d) ? '#9A6200' : '#6B6F7A')), 'Nenhum texto aguardando aprovação.'),
+      col('Peças em produção', 'brush', all.filter(d => S.G.producao.includes(d.status)).sort(byDue).map(d => item(d)), 'Nada em produção.'),
+      col('Reuniões agendadas', 'groups', comp.filter(c => c.tipo === 'reuniao').map(cItem), 'Sem reuniões nesta semana.'),
+      col('Relatórios para enviar', 'outgoing_mail', comp.filter(c => c.tipo === 'relatorio').map(cItem), 'Sem relatórios nesta semana.'),
+      col('Precisam de acompanhamento', 'notification_important', all.filter(d => S.parada(d) || d.status === 'Aguardando briefing ou informações' || d.status === 'Ajustes solicitados').map(d => item(d, S.diasNoStatus(d) + 'd parada', S.parada(d) ? '#9A6200' : '#6B6F7A')), 'Nenhuma demanda parada.')
+    ];
+
+    const BL = { geral: 'Peças gerais', feed: 'Instagram · Feed', stories: 'Instagram · Stories (unidades)' };
+    const buckets = ['geral', 'feed', 'stories'].map(b => {
+      const x = C[b], over = x.comprometido > x.limite, near = !over && x.comprometido >= x.limite * 0.8;
+      const lim = Math.max(x.limite, x.comprometido) || 1;
+      return {
+        label: BL[b], usado: x.usado, limite: x.limite, restante: Math.max(0, x.restante),
+        wUsado: (x.usado / lim * 100) + '%', wPrev: (x.previsto / lim * 100) + '%',
+        cor: over ? '#C4213B' : '#E6175C', corPrev: over ? '#F2A7B4' : '#F7B3C9',
+        nota: over ? 'Limite ultrapassado: ' + x.comprometido + ' comprometidas para ' + x.limite + ' contratadas' : near ? 'Atenção: ' + x.comprometido + ' de ' + x.limite + ' já comprometidas' : x.previsto + ' previstas · ' + x.pct + '% utilizado',
+        notaCor: over ? '#C4213B' : near ? '#9A6200' : '#6B6F7A'
+      };
+    });
+
+    const mAll = D.demandas.filter(d => S.mesRef(d) === mes);
+    const counts = S.STATUS.map(st => ({ label: st.curto, fg: st.fg, n: mAll.filter(d => d.status === st.nome).length })).filter(x => x.n > 0);
+    const mx = Math.max(1, ...counts.map(c => c.n));
+    counts.forEach(c => c.w = (c.n / mx * 100) + '%');
+
+    const atrasadas = all.filter(S.atrasada).sort(byDue).map(d => item(d, S.diffDays(t, d.entrega) + 'd atraso', '#C4213B'));
+    const proximas = all.filter(d => d.entrega >= t && d.entrega <= S.addDays(14) && !S.G.fechado.includes(d.status)).sort(byDue).map(d => {
+      const n = S.diffDays(d.entrega, t); return item(d, n === 0 ? 'Hoje' : n === 1 ? 'Amanhã' : S.fmt(d.entrega), S.prazoProximo(d) ? '#9A6200' : '#6B6F7A');
+    });
+    const cliente = all.filter(d => S.G.aguardandoCliente.includes(d.status)).sort((a, b) => S.diasNoStatus(b) - S.diasNoStatus(a)).map(d => item(d, S.diasNoStatus(d) + 'd', S.parada(d) ? '#9A6200' : '#6B6F7A'));
+    const listas = [
+      { titulo: 'Demandas atrasadas', icon: 'error', iconColor: '#C4213B', items: atrasadas, count: atrasadas.length, vazio: !atrasadas.length, vazioTxt: 'Nenhuma demanda atrasada.' },
+      { titulo: 'Próximas entregas · 14 dias', icon: 'event_upcoming', iconColor: '#E6175C', items: proximas, count: proximas.length, vazio: !proximas.length, vazioTxt: 'Nenhuma entrega nos próximos 14 dias.' },
+      { titulo: 'Aguardando o cliente', icon: 'schedule', iconColor: '#9A6200', items: cliente, count: cliente.length, vazio: !cliente.length, vazioTxt: 'Nada aguardando retorno do cliente.' }
+    ];
+
+    const reunioes = S.compromissos(t, S.addDays(30)).filter(c => c.tipo === 'reuniao').slice(0, 8).map(c => ({
+      titulo: c.titulo, quando: (c.data === t ? 'Hoje' : S.fmt(c.data)) + (c.hora ? ' ' + c.hora : ''), recorrente: !!c.recorrente, manual: !c.recorrente, hasLink: /^https?:\/\//.test(c.link || ''), link: c.link || '',
+      onRemove: () => S.removeReuniao(c.id)
+    }));
+    const DS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+    const recorrentes = D.recorrentes.map(r => {
+      const nx = S.compromissos(t, S.addDays(40)).find(c => c.rid === r.id);
+      return { titulo: r.titulo, quando: r.semanas ? 'Toda ' + r.semanas.map(i => DS[i]).join(' e ') + (r.hora ? ' · ' + r.hora : '') : r.semana != null ? 'Toda ' + DS[r.semana] + (r.hora ? ' · ' + r.hora : '') : 'Todo dia ' + r.mes, prox: nx ? (nx.data === t ? 'hoje' : S.fmt(nx.data)) : '—' };
+    });
+
+    const nr = this.state.nr, setNr = k => e => this.setState({ nr: { ...nr, [k]: e.target.value } });
+    const dt = new Date(t + 'T12:00');
+    return {
+      mesLabel: S.monthLabel(mes), hojeLabel: 'Hoje: ' + S.fmtLong(t),
+      prevM: () => this.setState({ mes: S.shiftMonth(mes, -1) }), nextM: () => this.setState({ mes: S.shiftMonth(mes, 1) }),
+      goDemandas: () => go('demandas'), goReunioes: () => go('reunioes'), goContrato: () => go('contrato'),
+      kpis, semana, semanaLabel: S.fmt(ws) + ' a ' + S.fmt(we), buckets, statusBars: counts, semStatus: counts.length === 0, listas, reunioes, recorrentes,
+      nr, onNr: { titulo: setNr('titulo'), data: setNr('data'), hora: setNr('hora') },
+      addReuniao: () => { if (!nr.titulo.trim() || !nr.data) return; S.addReuniao({ titulo: nr.titulo.trim(), data: nr.data, hora: nr.hora }); this.setState({ nr: { titulo: '', data: '', hora: '' } }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

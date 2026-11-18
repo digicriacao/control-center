@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&amp;display=block" rel="stylesheet">
+<script src="./store.js"></script>
+</helmet>
+<div style="padding:24px 28px 40px;display:flex;flex-direction:column;gap:16px;font-family:'Poppins',system-ui,sans-serif;color:#1F2128;font-size:13px;min-height:100%">
+
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;padding:3px;gap:2px">
+      <sc-for list="{{ views }}" as="v" hint-placeholder-count="3">
+        <button onClick="{{ v.onClick }}" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border:0;border-radius:6px;background:{{ v.bg }};color:{{ v.color }};font-size:12.5px;font-weight:500;cursor:pointer">
+          <span style="font-family:'Material Symbols Outlined';font-size:17px;line-height:1">{{ v.icon }}</span>{{ v.label }}
+        </button>
+      </sc-for>
+    </div>
+    <span style="font-size:12px;color:#6B6F7A">{{ countLabel }}</span>
+    <div style="flex:1"></div>
+    <input value="{{ fl.q }}" onChange="{{ onQ }}" placeholder="Filtrar por nome…" style="width:220px;padding:9px 12px;border:1px solid #DADDE2;border-radius:8px;background:#FFFFFF;font-size:12.5px;outline:none">
+    <button onClick="{{ onNew }}" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border:0;border-radius:8px;background:#E6175C;color:#FFFFFF;font-weight:600;font-size:12.5px;cursor:pointer" style-hover="background:#C9124F">
+      <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">add</span>Nova demanda
+    </button>
+  </div>
+
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:10px 12px">
+    <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:#8A8E98">filter_list</span>
+    <select value="{{ fl.mes }}" onChange="{{ onF.mes }}" style="padding:6px 8px;border:1px solid #DADDE2;border-radius:6px;background:#FFFFFF;font-size:12px">
+      <option value="">Todos os meses</option>
+      <sc-for list="{{ mesOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+    </select>
+    <select value="{{ fl.status }}" onChange="{{ onF.status }}" style="padding:6px 8px;border:1px solid #DADDE2;border-radius:6px;background:#FFFFFF;font-size:12px;max-width:180px">
+      <option value="">Todos os status</option>
+      <sc-for list="{{ statusOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+    </select>
+    <select value="{{ fl.categoria }}" onChange="{{ onF.categoria }}" style="padding:6px 8px;border:1px solid #DADDE2;border-radius:6px;background:#FFFFFF;font-size:12px">
+      <option value="">Todas as categorias</option>
+      <sc-for list="{{ catOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+    </select>
+    <select value="{{ fl.resp }}" onChange="{{ onF.resp }}" style="padding:6px 8px;border:1px solid #DADDE2;border-radius:6px;background:#FFFFFF;font-size:12px">
+      <option value="">Todos os responsáveis</option>
+      <sc-for list="{{ respOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+    </select>
+    <select value="{{ fl.prio }}" onChange="{{ onF.prio }}" style="padding:6px 8px;border:1px solid #DADDE2;border-radius:6px;background:#FFFFFF;font-size:12px">
+      <option value="">Prioridade</option>
+      <sc-for list="{{ prioOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+    </select>
+    <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:#6B6F7A">Entrega
+      <input type="date" value="{{ fl.de }}" onChange="{{ onF.de }}" style="padding:5px 6px;border:1px solid #DADDE2;border-radius:6px;font-size:11.5px">
+      até
+      <input type="date" value="{{ fl.ate }}" onChange="{{ onF.ate }}" style="padding:5px 6px;border:1px solid #DADDE2;border-radius:6px;font-size:11.5px">
+    </span>
+    <sc-for list="{{ chips }}" as="c" hint-placeholder-count="3">
+      <button onClick="{{ c.onClick }}" style="padding:6px 11px;border-radius:14px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-size:11.5px;font-weight:500;cursor:pointer;white-space:nowrap">{{ c.label }}</button>
+    </sc-for>
+    <sc-if value="{{ hasFilters }}">
+      <button onClick="{{ clearFilters }}" style="border:0;background:transparent;color:#E6175C;font-size:11.5px;font-weight:500;cursor:pointer">Limpar filtros</button>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ isKanban }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start">
+      <sc-for list="{{ columns }}" as="col" hint-placeholder-count="5">
+        <div onDragOver="{{ col.onDragOver }}" onDrop="{{ col.onDrop }}" style="width:264px;flex:none;background:{{ col.bg }};border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:360px">
+          <div style="display:flex;align-items:center;gap:8px;padding:4px 4px 6px">
+            <span style="width:8px;height:8px;border-radius:50%;background:{{ col.fg }};flex:none"></span>
+            <span style="font-size:12px;font-weight:600;flex:1">{{ col.label }}</span>
+            <span style="font-size:11px;color:#6B6F7A">{{ col.count }}</span>
+          </div>
+          <sc-for list="{{ col.cards }}" as="c" hint-placeholder-count="2">
+            <div draggable="true" onDragStart="{{ c.onDragStart }}" onClick="{{ c.onOpen }}" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;padding:11px 12px;display:flex;flex-direction:column;gap:8px;cursor:grab;box-shadow:0 1px 2px rgba(20,22,30,0.04)" style-hover="border-color:#C9CCD3">
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#6B6F7A">{{ c.categoria }}</span>
+                <span style="flex:1"></span>
+                <span style="width:7px;height:7px;border-radius:50%;background:{{ c.prioColor }}" title="{{ c.prioridade }}"></span>
+              </div>
+              <div style="font-size:12.5px;font-weight:500;line-height:1.4;text-wrap:pretty;text-decoration:{{ c.deco }}">{{ c.nome }}</div>
+              <sc-if value="{{ c.isParada }}">
+                <div style="font-size:10.5px;color:#9A6200;background:#FFF3DC;padding:3px 7px;border-radius:4px;align-self:flex-start">{{ c.paradaLabel }}</div>
+              </sc-if>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:#6B6F7A">
+                <span style="display:flex;align-items:center;gap:3px;color:{{ c.dueColor }};font-weight:{{ c.dueWeight }}"><span style="font-family:'Material Symbols Outlined';font-size:14px;line-height:1">event</span>{{ c.dueLabel }}</span>
+                <span>{{ c.pecas }}</span>
+                <span style="flex:1"></span>
+                <span title="{{ c.respInterno }}" style="width:22px;height:22px;border-radius:50%;background:#F4F5F7;border:1px solid #E5E7EB;font-size:9px;font-weight:600;display:grid;place-items:center">{{ c.ini }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isLista }}">
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;overflow:auto">
+      <div style="min-width:980px">
+        <div style="display:grid;grid-template-columns:minmax(240px,2.4fr) 170px 96px 130px 70px 74px 110px;gap:12px;padding:12px 18px;border-bottom:1px solid #E5E7EB;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#6B6F7A">
+          <span>Demanda</span><span>Status</span><span>Entrega</span><span>Responsável</span><span>Peças</span><span>Prior.</span><span>Contrato</span>
+        </div>
+        <sc-for list="{{ rows }}" as="c" hint-placeholder-count="6">
+          <div onClick="{{ c.onOpen }}" style="display:grid;grid-template-columns:minmax(240px,2.4fr) 170px 96px 130px 70px 74px 110px;gap:12px;padding:11px 18px;border-bottom:1px solid #F0F1F4;align-items:center;cursor:pointer" style-hover="background:#FAFAFB">
+            <div style="min-width:0;display:flex;flex-direction:column;gap:2px">
+              <span style="font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:{{ c.deco }}">{{ c.nome }}</span>
+              <span style="font-size:11px;color:#6B6F7A">{{ c.categoria }} · {{ c.tipo }}</span>
+            </div>
+            <select value="{{ c.status }}" onClick="{{ stop }}" onChange="{{ c.onStatus }}" style="width:100%;padding:5px 6px;border:0;border-radius:5px;background:{{ c.sbg }};color:{{ c.sfg }};font-size:11px;font-weight:600;cursor:pointer">
+              <sc-for list="{{ statusOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+            </select>
+            <span style="font-size:11.5px;color:{{ c.dueColor }};font-weight:{{ c.dueWeight }}">{{ c.dueLabel }}</span>
+            <span style="font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.respInterno }}</span>
+            <span style="font-size:11.5px">{{ c.pecasCurto }}</span>
+            <span style="display:flex;align-items:center;gap:6px;font-size:11.5px"><span style="width:7px;height:7px;border-radius:50%;background:{{ c.prioColor }}"></span>{{ c.prioridade }}</span>
+            <span style="font-size:11px;color:{{ c.sitColor }}">{{ c.sitLabel }}</span>
+          </div>
+        </sc-for>
+        <sc-if value="{{ isEmpty }}"><div style="padding:40px;text-align:center;color:#6B6F7A">Nenhuma demanda com esses filtros.</div></sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isCal }}">
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 18px 12px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onClick="{{ calPrev }}" style="width:30px;height:30px;border:1px solid #E5E7EB;border-radius:6px;background:#FFFFFF;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">chevron_left</span></button>
+        <button onClick="{{ calNext }}" style="width:30px;height:30px;border:1px solid #E5E7EB;border-radius:6px;background:#FFFFFF;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">chevron_right</span></button>
+        <span style="font-size:16px;font-weight:600;text-transform:capitalize;margin-left:6px">{{ calLabel }}</span>
+        <span style="font-size:11.5px;color:#6B6F7A;margin-left:8px">Clique num dia vazio para cadastrar uma entrega</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid #ECEEF1;border-left:1px solid #ECEEF1">
+        <sc-for list="{{ weekDays }}" as="w"><div style="padding:8px 10px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#6B6F7A;border-right:1px solid #ECEEF1;border-bottom:1px solid #ECEEF1">{{ w }}</div></sc-for>
+        <sc-for list="{{ calDays }}" as="day" hint-placeholder-count="35">
+          <div onClick="{{ day.onNew }}" style="min-height:112px;padding:6px;border-right:1px solid #ECEEF1;border-bottom:1px solid #ECEEF1;background:{{ day.bg }};display:flex;flex-direction:column;gap:4px;cursor:pointer">
+            <span style="font-size:11px;font-weight:{{ day.weight }};color:{{ day.color }};padding:2px 4px;align-self:flex-start;border-radius:10px;background:{{ day.numBg }}">{{ day.n }}</span>
+            <sc-for list="{{ day.items }}" as="c">
+              <div onClick="{{ c.onOpen }}" title="{{ c.nome }}" style="font-size:10.5px;font-weight:500;padding:3px 6px;border-radius:4px;background:{{ c.sbg }};color:{{ c.sfg }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:{{ c.deco }}">{{ c.nome }}</div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasForm }}">
+    <div onClick="{{ closeForm }}" style="position:fixed;inset:0;background:rgba(20,22,30,0.28);z-index:50"></div>
+    <aside style="position:fixed;top:0;right:0;bottom:0;width:560px;max-width:100vw;background:#F4F5F7;z-index:51;display:flex;flex-direction:column;box-shadow:-12px 0 40px rgba(20,22,30,0.16)">
+      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;padding:0 20px">
+        <span style="font-size:15px;font-weight:700;flex:1">{{ formTitle }}</span>
+        <span style="font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:4px;background:{{ fm.sbg }};color:{{ fm.sfg }}">{{ form.status }}</span>
+        <button onClick="{{ closeForm }}" style="width:32px;height:32px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0" style-hover="background:#F4F5F7"><span style="font-family:'Material Symbols Outlined';font-size:20px;line-height:1">close</span></button>
+      </div>
+      <div style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
+
+        <section style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:14px;font-weight:600">Identificação</div>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Nome da demanda <span style="display:none"></span>
+            <input value="{{ form.nome }}" onChange="{{ on.nome }}" placeholder="Ex.: Régua Unicred — E-mail 6" style="padding:10px 12px;border:1px solid {{ fm.nomeBorder }};border-radius:6px;font-size:12.5px;font-weight:400;outline:none">
+          </label>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Cliente
+              <input value="{{ form.cliente }}" onChange="{{ on.cliente }}" style="padding:10px 12px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;outline:none">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Categoria
+              <select value="{{ form.categoria }}" onChange="{{ on.categoria }}" style="padding:10px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;background:#FFFFFF">
+                <sc-for list="{{ catOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+              </select>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Tipo de material
+              <select value="{{ form.tipo }}" onChange="{{ on.tipo }}" style="padding:10px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;background:#FFFFFF">
+                <sc-for list="{{ tipoOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+              </select>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Prioridade
+              <select value="{{ form.prioridade }}" onChange="{{ on.prioridade }}" style="padding:10px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;background:#FFFFFF">
+                <sc-for list="{{ prioOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+              </select>
+            </label>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Descrição
+            <textarea value="{{ form.descricao }}" onChange="{{ on.descricao }}" rows="3" placeholder="O que foi solicitado no e-mail do cliente" style="padding:10px 12px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;outline:none;resize:vertical;line-height:1.5"></textarea>
+          </label>
+        </section>
+
+        <section style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:14px;font-weight:600">Status, prazos e responsáveis</div>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Status atual
+            <select value="{{ form.status }}" onChange="{{ on.status }}" style="padding:10px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:500;background:{{ fm.sbg }};color:{{ fm.sfg }}">
+              <sc-for list="{{ statusOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+            </select>
+          </label>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Data de recebimento
+              <input type="date" value="{{ form.recebimento }}" onChange="{{ on.recebimento }}" style="padding:9px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Data de entrega
+              <input type="date" value="{{ form.entrega }}" onChange="{{ on.entrega }}" style="padding:9px 10px;border:1px solid {{ fm.entregaBorder }};border-radius:6px;font-size:12.5px;font-weight:400">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Responsável interno
+              <select value="{{ form.respInterno }}" onChange="{{ on.respInterno }}" style="padding:10px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;background:#FFFFFF">
+                <sc-for list="{{ respFormOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+              </select>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Responsável pela aprovação
+              <select value="{{ form.respAprov }}" onChange="{{ on.respAprov }}" style="padding:10px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;background:#FFFFFF">
+                <sc-for list="{{ aprovOpts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px;font-weight:600;flex:1">Peças e contrato</span>
+            <span style="font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:4px;color:{{ fm.sitColor }};background:{{ fm.sitBg }}">{{ fm.sitLabel }}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:110px minmax(0,1fr) minmax(0,1fr);gap:12px">
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Qtd. de peças
+              <input type="number" min="0" value="{{ form.qtd }}" onChange="{{ on.qtd }}" style="padding:9px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Consome contrato?
+              <select value="{{ form.contrato.modo }}" onChange="{{ onModo }}" style="padding:10px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;background:#FFFFFF">
+                <option value="auto">Automático (regra)</option>
+                <option value="sim">Sim — exceção</option>
+                <option value="nao">Não consome</option>
+              </select>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Mês de referência
+              <input type="month" value="{{ fm.mes }}" onChange="{{ on.mesRef }}" style="padding:8px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400">
+            </label>
+          </div>
+          <sc-if value="{{ fm.isStories }}">
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Campanha de stories
+              <input value="{{ form.contrato.campanha }}" onChange="{{ onCampanha }}" placeholder="Stories com o mesmo nome de campanha no mês contam como 1 unidade" style="padding:10px 12px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;outline:none">
+            </label>
+          </sc-if>
+          <div style="font-size:11.5px;color:#6B6F7A;line-height:1.5;text-wrap:pretty">{{ fm.regraTxt }}</div>
+        </section>
+
+        <section style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:14px;font-weight:600">Links e observações</div>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Link do briefing
+            <span style="display:flex;gap:6px">
+              <input value="{{ form.briefing }}" onChange="{{ on.briefing }}" placeholder="Cole o link do briefing" style="flex:1;min-width:0;padding:10px 12px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;outline:none">
+              <sc-if value="{{ fm.hasBriefing }}"><a href="{{ form.briefing }}" target="_blank" rel="noopener" style="display:grid;place-items:center;padding:0 12px;border:1px solid #DADDE2;border-radius:6px;font-size:12px;text-decoration:none">Abrir</a></sc-if>
+            </span>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Link dos arquivos (SharePoint)
+            <span style="display:flex;gap:6px">
+              <input value="{{ form.arquivos }}" onChange="{{ on.arquivos }}" placeholder="Cole o link da pasta" style="flex:1;min-width:0;padding:10px 12px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;outline:none">
+              <sc-if value="{{ fm.hasArquivos }}"><a href="{{ form.arquivos }}" target="_blank" rel="noopener" style="display:grid;place-items:center;padding:0 12px;border:1px solid #DADDE2;border-radius:6px;font-size:12px;text-decoration:none">Abrir</a></sc-if>
+            </span>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">Observações
+            <textarea value="{{ form.obs }}" onChange="{{ on.obs }}" rows="3" style="padding:10px 12px;border:1px solid #DADDE2;border-radius:6px;font-size:12.5px;font-weight:400;outline:none;resize:vertical;line-height:1.5"></textarea>
+          </label>
+        </section>
+
+        <sc-if value="{{ fm.hasHist }}">
+          <section style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:14px;font-weight:600">Histórico de alterações</div>
+            <sc-for list="{{ fm.hist }}" as="h">
+              <div style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;font-size:11.5px;padding:6px 0;border-bottom:1px solid #F0F1F4">
+                <span style="color:#6B6F7A">{{ h.quando }}</span>
+                <span style="text-wrap:pretty">{{ h.txt }}</span>
+              </div>
+            </sc-for>
+          </section>
+        </sc-if>
+      </div>
+      <div style="flex:none;background:#FFFFFF;border-top:1px solid #E5E7EB;padding:12px 20px;display:flex;align-items:center;gap:10px">
+        <sc-if value="{{ fm.isEdit }}">
+          <button onClick="{{ onDelete }}" style="border:0;background:transparent;color:#C4213B;font-size:12.5px;cursor:pointer;padding:8px 0">Excluir</button>
+        </sc-if>
+        <span style="flex:1;font-size:11.5px;color:#C4213B">{{ fm.erro }}</span>
+        <button onClick="{{ closeForm }}" style="padding:10px 16px;border:1px solid #DADDE2;border-radius:8px;background:#FFFFFF;font-size:12.5px;cursor:pointer;white-space:nowrap">Cancelar</button>
+        <button onClick="{{ onSave }}" style="padding:10px 20px;border:0;border-radius:8px;background:#E6175C;color:#FFFFFF;font-weight:600;font-size:12.5px;cursor:pointer;white-space:nowrap">Salvar demanda</button>
+      </div>
+    </aside>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  F0 = { q: '', mes: '', status: '', categoria: '', resp: '', prio: '', de: '', ate: '', atrasadas: false, aprov: false, ocultar: false };
+  state = { view: localStorage.getItem('digi-pcc-dview') || 'kanban', f: { ...this.F0 }, form: null, erro: '', cal: null, over: null };
+
+  componentDidMount() {
+    const init = () => {
+      if (!window.DigiStore) return void (this.t = setTimeout(init, 40));
+      this.unsub = window.DigiStore.subscribe(() => this.forceUpdate());
+      this.forceUpdate();
+      if (this.props.openId) this.openId(this.props.openId);
+    };
+    init();
+  }
+  componentDidUpdate(p) { if (this.props.openId && this.props.openId !== p.openId) this.openId(this.props.openId); }
+  componentWillUnmount() { this.unsub && this.unsub(); clearTimeout(this.t); }
+  openId(id) {
+    const S = window.DigiStore;
+    if (String(id).startsWith('newr:')) {
+      this.setState({ form: S.novaDemanda({ categoria: 'Réguas', nome: id.slice(5) + ' — ', mesRef: S.monthOf(S.today()) }), erro: '' });
+      this.props.onOpened && this.props.onOpened(); return;
+    }
+    if (String(id).startsWith('new:')) {
+      const dt = id.slice(4);
+      this.setState({ form: S.novaDemanda({ categoria: 'Instagram', tipo: 'Feed · Peça única', entrega: dt, mesRef: dt ? '' : S.monthOf(S.today()) }), erro: '' });
+      this.props.onOpened && this.props.onOpened(); return;
+    }
+    const d = S.get().demandas.find(x => x.id === id);
+    if (d) this.setState({ form: JSON.parse(JSON.stringify(d)), erro: '' });
+    this.props.onOpened && this.props.onOpened();
+  }
+
+  renderVals() {
+    const S = window.DigiStore;
+    if (!S) return { views: [], columns: [], rows: [], chips: [], calDays: [] };
+    const s = this.state, f = s.f, D = S.get(), t = S.today();
+    const q = f.q.trim().toLowerCase();
+    const list = D.demandas.filter(x =>
+      (!f.mes || S.mesRef(x) === f.mes) && (!f.status || x.status === f.status) && (!f.categoria || x.categoria === f.categoria) &&
+      (!f.resp || x.respInterno === f.resp || x.respAprov === f.resp) && (!f.prio || x.prioridade === f.prio) &&
+      (!f.de || (x.entrega && x.entrega >= f.de)) && (!f.ate || (x.entrega && x.entrega <= f.ate)) &&
+      (!f.atrasadas || S.atrasada(x)) && (!f.aprov || S.G.aprovacao.includes(x.status)) &&
+      (!f.ocultar || !['Concluído', 'Cancelado'].includes(x.status)) &&
+      (!q || [x.nome, x.tipo, x.obs, x.descricao].join(' ').toLowerCase().includes(q))
+    ).sort((a, b) => (a.entrega || '9999').localeCompare(b.entrega || '9999'));
+
+    const PC = { Alta: '#C4213B', 'Média': '#D99A00', Baixa: '#2F5BD3' };
+    const SIT = { contabilizada: ['Contabilizada', '#1F7A3A', '#E3F4E8'], prevista: ['Prevista', '#2F5BD3', '#E8EEFC'], nao: ['Não consome', '#6B6F7A', '#EEF0F3'] };
+    const card = x => {
+      const m = S.statusMeta(x.status), late = S.atrasada(x), soon = S.prazoProximo(x), b = S.bucketOf(x), sit = S.situacao(x);
+      const dd = x.entrega ? S.diffDays(x.entrega, t) : null;
+      const due = !x.entrega ? 'Sem prazo' : late ? 'Atrasada · ' + S.fmt(x.entrega) : dd === 0 ? 'Hoje' : dd === 1 ? 'Amanhã' : S.fmt(x.entrega);
+      const qtd = +x.qtd || 0;
+      return {
+        ...x, sfg: m.fg, sbg: m.bg, deco: x.status === 'Cancelado' ? 'line-through' : 'none',
+        dueLabel: due, dueColor: late ? '#C4213B' : soon ? '#9A6200' : '#6B6F7A', dueWeight: late || soon ? 600 : 400,
+        pecas: b === 'stories' ? 'Stories' + (x.contrato.campanha ? ' · ' + x.contrato.campanha : '') : qtd + (qtd === 1 ? ' peça' : ' peças'),
+        pecasCurto: b === 'stories' ? 'Stories' : String(qtd),
+        prioColor: PC[x.prioridade] || '#6B6F7A',
+        ini: x.respInterno ? x.respInterno.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() : '—',
+        isParada: S.parada(x), paradaLabel: 'Parada há ' + S.diasNoStatus(x) + ' dias',
+        sitLabel: SIT[sit][0], sitColor: SIT[sit][1],
+        onOpen: e => { e && e.stopPropagation(); this.setState({ form: JSON.parse(JSON.stringify(x)), erro: '' }); },
+        onDragStart: e => { this.drag = x.id; e.dataTransfer.effectAllowed = 'move'; },
+        onStatus: e => S.setStatus(x.id, e.target.value)
+      };
+    };
+    const cards = list.map(card);
+
+    const hideCols = f.ocultar ? ['Concluído', 'Cancelado'] : [];
+    const columns = S.STATUS.filter(st => !hideCols.includes(st.nome) && (!f.status || f.status === st.nome)).map(st => {
+      const cs = cards.filter(c => c.status === st.nome);
+      return {
+        label: st.curto, fg: st.fg, count: cs.length, cards: cs, bg: s.over === st.nome ? '#FBE3EC' : '#EBEDF0',
+        onDragOver: e => { e.preventDefault(); if (s.over !== st.nome) this.setState({ over: st.nome }); },
+        onDrop: e => { e.preventDefault(); if (this.drag) S.setStatus(this.drag, st.nome); this.drag = null; this.setState({ over: null }); }
+      };
+    });
+
+    const calM = s.cal || f.mes || S.monthOf(t);
+    const [cy, cm] = calM.split('-').map(Number);
+    const first = new Date(cy, cm - 1, 1), start = new Date(first); start.setDate(1 - ((first.getDay() + 6) % 7));
+    const calDays = [];
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start); d.setDate(start.getDate() + i); const k = S.ymd(d);
+      if (i >= 35 && d.getMonth() !== cm - 1) break;
+      const inM = d.getMonth() === cm - 1, isT = k === t;
+      calDays.push({
+        n: d.getDate(), bg: inM ? '#FFFFFF' : '#FAFAFB', color: isT ? '#FFFFFF' : inM ? '#1F2128' : '#B3B6BE', weight: isT ? 600 : 400, numBg: isT ? '#E6175C' : 'transparent',
+        items: cards.filter(c => c.entrega === k),
+        onNew: () => this.setState({ form: S.novaDemanda({ entrega: k }), erro: '' })
+      });
+    }
+
+    const setF = (k, v) => this.setState(st => ({ f: { ...st.f, [k]: v } }));
+    const onF = {}; ['mes', 'status', 'categoria', 'resp', 'prio', 'de', 'ate'].forEach(k => onF[k] = e => setF(k, e.target.value));
+    const chip = (k, label) => ({ label, onClick: () => setF(k, !f[k]), bg: f[k] ? '#FDECF2' : '#FFFFFF', border: f[k] ? '#E6175C' : '#DADDE2', color: f[k] ? '#B80F47' : '#4A4E58' });
+    const months = [...new Set(D.demandas.map(x => S.mesRef(x)).filter(Boolean).concat(S.monthOf(t)))].sort().reverse();
+    const opts = a => a.map(v => ({ v, l: v }));
+
+    const form = s.form;
+    let fm = {}, on = {}, tipoOpts = [];
+    if (form) {
+      const m = S.statusMeta(form.status), sit = S.situacao(form), b = S.bucketOf(form);
+      const upd = p => this.setState(st => ({ form: { ...st.form, ...p } }));
+      Object.keys(form).forEach(k => on[k] = e => upd({ [k]: k === 'qtd' ? e.target.value.replace(/\D/g, '') : e.target.value }));
+      on.mesRef = e => upd({ mesRef: e.target.value });
+      on.categoria = e => { const c = e.target.value, tl = c === 'Instagram' ? S.TIPOS_IG : S.TIPOS; upd({ categoria: c, tipo: tl.includes(form.tipo) ? form.tipo : tl[0] }); };
+      tipoOpts = opts(form.categoria === 'Instagram' ? S.TIPOS_IG : S.TIPOS);
+      const BL = { geral: 'peças gerais (limite ' + D.settings.limites.geral + ')', feed: 'feed do Instagram (limite ' + D.settings.limites.feed + ')', stories: 'stories (limite ' + D.settings.limites.stories + ' unidades; cada campanha conta 1 unidade)' };
+      fm = {
+        sbg: m.bg, sfg: m.fg, isEdit: !!form.id, erro: s.erro,
+        nomeBorder: s.erro && !form.nome.trim() ? '#C4213B' : '#DADDE2', entregaBorder: '#DADDE2',
+        mes: form.mesRef || S.monthOf(form.entrega), isStories: b === 'stories',
+        sitLabel: SIT[sit][0], sitColor: SIT[sit][1], sitBg: SIT[sit][2],
+        regraTxt: sit === 'nao' ? 'Esta demanda não consome peças do contrato.' : 'Conta em ' + BL[b] + '. Regra atual: ' + (S.REGRAS[D.settings.regra].charAt(0).toLowerCase() + S.REGRAS[D.settings.regra].slice(1)) + '. Até lá, aparece como prevista.',
+        hasBriefing: /^https?:\/\//.test(form.briefing || ''), hasArquivos: /^https?:\/\//.test(form.arquivos || ''),
+        hasHist: (form.historico || []).length > 0,
+        hist: (form.historico || []).map(h => { const d = new Date(h.ts); return { txt: h.txt, quando: String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') }; })
+      };
+    }
+    const hasFilters = Object.keys(this.F0).some(k => f[k] !== this.F0[k]);
+    const VW = [['kanban', 'Kanban', 'view_kanban'], ['lista', 'Lista', 'table_rows'], ['calendario', 'Calendário', 'calendar_month']];
+
+    return {
+      views: VW.map(([id, label, icon]) => ({ label, icon, bg: s.view === id ? '#E6175C' : 'transparent', color: s.view === id ? '#FFFFFF' : '#4A4E58', onClick: () => { localStorage.setItem('digi-pcc-dview', id); this.setState({ view: id }); } })),
+      isKanban: s.view === 'kanban', isLista: s.view === 'lista', isCal: s.view === 'calendario',
+      countLabel: list.length + (list.length === 1 ? ' demanda' : ' demandas'),
+      fl: f, onQ: e => setF('q', e.target.value), onF,
+      mesOpts: months.map(v => ({ v, l: S.monthLabel(v) })), statusOpts: opts(S.SN), catOpts: opts(S.CATEGORIAS), respOpts: opts([...new Set([...S.RESP, ...S.APROV])]), respFormOpts: [{ v: '', l: '—' }, ...opts(S.RESP)], aprovOpts: [{ v: '', l: '—' }, ...opts(S.APROV)], prioOpts: opts(S.PRIORIDADES), tipoOpts,
+      chips: [chip('atrasadas', 'Atrasadas'), chip('aprov', 'Aguardando aprovação'), chip('ocultar', 'Ocultar concluídas e canceladas')],
+      hasFilters, clearFilters: () => this.setState({ f: { ...this.F0 } }),
+      columns, rows: cards, isEmpty: cards.length === 0, stop: e => e.stopPropagation(),
+      calLabel: S.monthLabel(calM), calDays, weekDays: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+      calPrev: () => this.setState({ cal: S.shiftMonth(calM, -1) }), calNext: () => this.setState({ cal: S.shiftMonth(calM, 1) }),
+      onNew: () => this.setState({ form: S.novaDemanda(), erro: '' }),
+      hasForm: !!form, form: form || { contrato: {} }, fm, on, formTitle: form && form.id ? 'Editar demanda' : 'Nova demanda',
+      onModo: e => this.setState(st => ({ form: { ...st.form, contrato: { ...st.form.contrato, modo: e.target.value } } })),
+      onCampanha: e => this.setState(st => ({ form: { ...st.form, contrato: { ...st.form.contrato, campanha: e.target.value } } })),
+      closeForm: () => this.setState({ form: null, erro: '' }),
+      onSave: () => {
+        if (!form.nome.trim()) return this.setState({ erro: 'Preencha o nome da demanda.' });
+        if (!form.entrega && !form.mesRef) form.mesRef = S.monthOf(S.today());
+        S.salvarDemanda({ ...form, nome: form.nome.trim(), qtd: +form.qtd || 0 }); this.setState({ form: null, erro: '' });
+      },
+      onDelete: () => { if (confirm('Excluir "' + form.nome + '"? Esta ação não pode ser desfeita.')) { S.excluirDemanda(form.id); this.setState({ form: null }); } }
+    };
+  }
+}
+</script>
+</body>
+</html>

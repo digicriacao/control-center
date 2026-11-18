@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&amp;display=block" rel="stylesheet">
+<script src="./store.js"></script>
+</helmet>
+<div style="padding:24px 28px 48px;display:flex;flex-direction:column;gap:16px;font-family:'Poppins',system-ui,sans-serif;color:#1F2128;font-size:13px">
+
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:4px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;padding:3px">
+      <button onClick="{{ prevM }}" style="width:28px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">chevron_left</span></button>
+      <span style="font-size:13px;font-weight:600;text-transform:capitalize;min-width:128px;text-align:center">{{ mesLabel }}</span>
+      <button onClick="{{ nextM }}" style="width:28px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">chevron_right</span></button>
+    </div>
+    <div style="display:flex;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;padding:3px;gap:2px">
+      <sc-for list="{{ tabs }}" as="v" hint-placeholder-count="3">
+        <button onClick="{{ v.onClick }}" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border:0;border-radius:6px;background:{{ v.bg }};color:{{ v.color }};font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap">
+          <span style="font-family:'Material Symbols Outlined';font-size:17px;line-height:1">{{ v.icon }}</span>{{ v.label }}
+        </button>
+      </sc-for>
+    </div>
+    <div style="flex:1"></div>
+    <button onClick="{{ onNew }}" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border:0;border-radius:8px;background:#E6175C;color:#FFFFFF;font-weight:600;font-size:12.5px;cursor:pointer;white-space:nowrap"><span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">add</span>Nova publicação</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+    <sc-for list="{{ contadores }}" as="c" hint-placeholder-count="3">
+      <div style="background:#FFFFFF;border:1px solid {{ c.border }};border-radius:10px;padding:14px 18px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:#E6175C">{{ c.icon }}</span>
+          <span style="font-size:12px;font-weight:500;color:#6B6F7A;flex:1">{{ c.label }}</span>
+          <span style="font-size:11px;font-weight:600;color:{{ c.notaCor }}">{{ c.nota }}</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:26px;font-weight:600;letter-spacing:-0.02em">{{ c.valor }}</span><span style="font-size:12px;color:#6B6F7A;white-space:nowrap">{{ c.de }}</span></div>
+        <div style="height:8px;border-radius:4px;background:#F0F1F4;display:flex;overflow:hidden">
+          <div style="width:{{ c.w1 }};background:{{ c.cor }}"></div><div style="width:{{ c.w2 }};background:{{ c.cor2 }}"></div>
+        </div>
+      </div>
+    </sc-for>
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:14px 18px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:#E6175C">verified</span>
+        <span style="font-size:12px;font-weight:500;color:#6B6F7A">Aprovação do calendário pelo cliente</span>
+      </div>
+      <select value="{{ ig.aprovacao }}" onChange="{{ onAprov }}" style="padding:8px 10px;border:0;border-radius:6px;background:{{ aprovBg }};color:{{ aprovFg }};font-size:13px;font-weight:600">
+        <sc-for list="{{ aprovOpts }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
+      </select>
+      <label style="display:flex;align-items:center;gap:8px;font-size:11px;color:#6B6F7A">Data
+        <input type="date" value="{{ ig.aprovadoEm }}" onChange="{{ onAprovData }}" style="padding:4px 6px;border:1px solid #DADDE2;border-radius:5px;font-size:11.5px">
+      </label>
+    </div>
+  </div>
+
+  <sc-if value="{{ hasAviso }}">
+    <div style="display:flex;align-items:center;gap:10px;background:#FFF3DC;color:#7A4E00;border-radius:8px;padding:10px 14px;font-size:12px">
+      <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1">event_note</span>
+      <span style="flex:1;text-wrap:pretty">{{ aviso }}</span>
+      <button onClick="{{ goProx }}" style="border:0;background:transparent;color:#7A4E00;font-weight:600;font-size:12px;cursor:pointer;white-space:nowrap">Abrir planejamento</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isCal }}" hint-placeholder-val="{{ true }}">
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr))">
+        <sc-for list="{{ weekDays }}" as="w"><div style="padding:10px 12px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#6B6F7A;border-bottom:1px solid #E5E7EB">{{ w }}</div></sc-for>
+        <sc-for list="{{ calDays }}" as="day" hint-placeholder-count="35">
+          <div onClick="{{ day.onNew }}" style="min-height:128px;padding:8px;border-right:1px solid #ECEEF1;border-bottom:1px solid #ECEEF1;background:{{ day.bg }};display:flex;flex-direction:column;gap:6px;cursor:{{ day.cursor }}">
+            <span style="font-size:12px;font-weight:600;color:{{ day.color }};align-self:flex-start;padding:1px 6px;border-radius:10px;background:{{ day.numBg }}">{{ day.n }}</span>
+            <sc-for list="{{ day.posts }}" as="p">
+              <button onClick="{{ p.onOpen }}" style="display:flex;flex-direction:column;gap:4px;padding:7px 8px;border:1px solid #E5E7EB;border-left:0;border-radius:6px;background:#FFFFFF;text-align:left;cursor:pointer;box-shadow:inset 3px 0 0 {{ p.fmtCor }}">
+                <span style="font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:{{ p.fmtCor }}">{{ p.formato }}</span>
+                <span style="font-size:11.5px;font-weight:500;line-height:1.3;text-decoration:{{ p.deco }};text-wrap:pretty">{{ p.nome }}</span>
+                <span style="font-size:9.5px;font-weight:600;padding:2px 6px;border-radius:3px;background:{{ p.sbg }};color:{{ p.sfg }};align-self:flex-start">{{ p.status }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-family:'Material Symbols Outlined';font-size:18px;line-height:1;color:#E6175C">event_available</span>
+        <span style="font-size:13px;font-weight:600;flex:1">Em aberto · sem data definida</span>
+        <span style="font-size:11px;color:#6B6F7A">espontâneas, eventos, tendências e oportunidades</span>
+      </div>
+      <sc-for list="{{ semData }}" as="p">
+        <button onClick="{{ p.onOpen }}" style="display:flex;align-items:center;gap:10px;padding:8px 0;border:0;border-top:1px solid #F0F1F4;background:transparent;text-align:left;cursor:pointer">
+          <span style="font-size:10px;font-weight:600;text-transform:uppercase;color:{{ p.fmtCor }};width:120px;flex:none">{{ p.formato }}</span>
+          <span style="flex:1;font-size:12px;font-weight:500">{{ p.nome }}</span>
+          <span style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px;background:{{ p.sbg }};color:{{ p.sfg }}">{{ p.status }}</span>
+        </button>
+      </sc-for>
+      <sc-if value="{{ semDataVazio }}"><div style="font-size:11.5px;color:#9A9EA8">Nenhuma publicação em aberto. Cadastre sem data de entrega para reservar uma vaga.</div></sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isPlan }}">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:12px;align-items:start">
+      <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:14px;font-weight:600;flex:1">Fluxo de produção</span>
+          <span style="font-size:11.5px;color:#6B6F7A">{{ etapasFeitas }} de 12 concluídas</span>
+        </div>
+        <div style="height:6px;border-radius:3px;background:#F0F1F4"><div style="height:100%;width:{{ etapasPct }};border-radius:3px;background:#E6175C"></div></div>
+        <sc-for list="{{ etapas }}" as="e" hint-placeholder-count="12">
+          <div style="display:grid;grid-template-columns:26px minmax(0,1fr) 132px 128px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #F0F1F4">
+            <span style="width:22px;height:22px;border-radius:50%;background:{{ e.numBg }};color:{{ e.numFg }};font-size:10.5px;font-weight:600;display:grid;place-items:center">{{ e.n }}</span>
+            <span style="font-size:12px;font-weight:500;display:flex;flex-direction:column">{{ e.nome }}<sc-if value="{{ e.atrasada }}"><span style="font-size:10.5px;color:#C4213B;font-weight:600">Prazo vencido</span></sc-if></span>
+            <select value="{{ e.status }}" onChange="{{ e.onStatus }}" style="padding:5px 6px;border:1px solid #DADDE2;border-radius:5px;background:#FFFFFF;font-size:11.5px">
+              <option value="Pendente">Pendente</option><option value="Em andamento">Em andamento</option><option value="Concluída">Concluída</option>
+            </select>
+            <input type="date" value="{{ e.prazo }}" onChange="{{ e.onPrazo }}" style="padding:4px 6px;border:1px solid {{ e.prazoBorder }};border-radius:5px;font-size:11.5px">
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span style="font-size:14px;font-weight:600">Alinhamento estratégico com o cliente</span>
+          <span style="font-size:11.5px;color:#6B6F7A">Preencher antes de iniciar a produção.</span>
+        </div>
+        <sc-for list="{{ alinhamento }}" as="a" hint-placeholder-count="8">
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:500">{{ a.label }}
+            <textarea value="{{ a.valor }}" onChange="{{ a.onChange }}" rows="2" style="padding:8px 10px;border:1px solid #DADDE2;border-radius:6px;font-size:12px;font-weight:400;resize:vertical;line-height:1.5;outline:none"></textarea>
+          </label>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mes: null, tab: localStorage.getItem('digi-pcc-igtab') || 'cal' };
+  componentDidMount() {
+    const init = () => {
+      if (!window.DigiStore) return void (this.t = setTimeout(init, 40));
+      this.unsub = window.DigiStore.subscribe(() => this.forceUpdate());
+      this.forceUpdate();
+    };
+    init();
+  }
+  componentWillUnmount() { this.unsub && this.unsub(); clearTimeout(this.t); }
+
+  renderVals() {
+    const S = window.DigiStore;
+    if (!S) return { tabs: [], contadores: [], calDays: [], semData: [], refDays: [], refLegenda: [], etapas: [], alinhamento: [], aprovOpts: [], ig: {}, ref: { notas: [] }, weekDays: [] };
+    const D = S.get(), t = S.today(), mes = this.state.mes || S.monthOf(t), go = this.props.go || (() => { }), tab = this.state.tab === 'plan' ? 'plan' : 'cal';
+    const C = S.contrato(mes), ig = S.igMes(mes);
+    const FC = { Feed: '#E6175C', Stories: '#7A3FB8' };
+    const posts = D.demandas.filter(d => d.categoria === 'Instagram' && S.mesRef(d) === mes).map(d => {
+      const m = S.statusMeta(d.status), kind = (d.tipo || '').startsWith('Stories') ? 'Stories' : 'Feed';
+      return { ...d, formato: d.tipo, fmtCor: FC[kind], status: m.curto, sbg: m.bg, sfg: m.fg, deco: d.status === 'Cancelado' ? 'line-through' : 'none', onOpen: e => { e.stopPropagation(); go('demandas', d.id); } };
+    });
+
+    const cnt = (b, label, icon, un) => {
+      const x = C[b], over = x.comprometido > x.limite, lim = Math.max(x.limite, x.comprometido) || 1;
+      return {
+        label, icon, valor: x.usado, de: 'de ' + x.limite + ' ' + un + ' · ' + x.previsto + ' previstas',
+        w1: (x.usado / lim * 100) + '%', w2: (x.previsto / lim * 100) + '%', cor: over ? '#C4213B' : '#E6175C', cor2: over ? '#F2A7B4' : '#F7B3C9',
+        nota: over ? 'Acima do limite' : x.comprometido === x.limite ? 'Limite completo' : (x.limite - x.comprometido) + ' livres',
+        notaCor: over ? '#C4213B' : x.comprometido === x.limite ? '#9A6200' : '#1F7A3A', border: over ? '#F2A7B4' : '#E5E7EB'
+      };
+    };
+    const contadores = [cnt('feed', 'Feed', 'grid_view', 'feeds'), cnt('stories', 'Stories', 'amp_stories', 'unidades')];
+
+    const [y, m] = mes.split('-').map(Number);
+    const first = new Date(y, m - 1, 1), lead = first.getDay(), nDays = new Date(y, m, 0).getDate();
+    const cells = Math.ceil((lead + nDays) / 7) * 7;
+    const calDays = [], refDays = [], ref = S.REF_IG[mes];
+    for (let i = 0; i < cells; i++) {
+      const dn = i - lead + 1, inM = dn >= 1 && dn <= nDays, k = inM ? mes + '-' + String(dn).padStart(2, '0') : '';
+      const wk = i % 7 === 0 || i % 7 === 6, isT = k === t;
+      calDays.push({
+        n: inM ? dn : '', bg: !inM ? '#FAFAFB' : wk ? '#FCFCFD' : '#FFFFFF', color: isT ? '#FFFFFF' : wk ? '#8A8E98' : '#1F2128', numBg: isT ? '#E6175C' : 'transparent',
+        cursor: inM ? 'pointer' : 'default', posts: inM ? posts.filter(p => p.entrega === k) : [],
+        onNew: () => inM && go('demandas', 'new:' + k)
+      });
+      const r = inM && ref ? ref.dias[dn] : null, tg = r && r.grupo ? ref.tags[r.grupo] : null;
+      refDays.push({
+        n: inM ? dn : '', bg: !inM ? '#F4F5F7' : wk ? '#FAFAFB' : '#FFFFFF', color: wk ? '#8A8E98' : '#1F2128',
+        hasNota: !!(r && r.nota), nota: r && r.nota, hasPost: !!(r && r.titulo), tag: r && r.tag, titulo: r && r.titulo, txt: r && r.txt, formato: r && r.formato, fg: tg ? tg[0] : '#5F6470'
+      });
+    }
+    const semData = posts.filter(p => !p.entrega);
+
+    const AP = { 'Não enviado': ['#EEF0F3', '#5F6470'], 'Enviado ao cliente': ['#FFF3DC', '#9A6200'], 'Ajustes solicitados': ['#FDE6EA', '#C4213B'], 'Aprovado': ['#E3F4E8', '#1F7A3A'] };
+    const prox = S.shiftMonth(S.monthOf(t), 1), dia = +t.slice(8, 10), igProx = S.igMes(prox);
+    const hasAviso = mes === S.monthOf(t) && dia <= 20 && igProx.aprovacao !== 'Aprovado';
+    const etapas = ig.etapas.map((e, i) => {
+      const late = e.prazo && e.prazo < t && e.status !== 'Concluída', done = e.status === 'Concluída';
+      const set = p => { const et = ig.etapas.map((x, j) => j === i ? { ...x, ...p } : x); S.setIg(mes, { etapas: et }); };
+      return { ...e, n: i + 1, atrasada: !!late, numBg: done ? '#E6175C' : e.status === 'Em andamento' ? '#FDECF2' : '#F4F5F7', numFg: done ? '#FFFFFF' : e.status === 'Em andamento' ? '#E6175C' : '#6B6F7A', prazoBorder: late ? '#C4213B' : '#DADDE2', onStatus: ev => set({ status: ev.target.value }), onPrazo: ev => set({ prazo: ev.target.value }) };
+    });
+    const feitas = ig.etapas.filter(e => e.status === 'Concluída').length;
+    const TABS = [['cal', 'Calendário', 'calendar_month'], ['plan', 'Planejamento e fluxo', 'checklist']];
+    const setTab = id => { localStorage.setItem('digi-pcc-igtab', id); this.setState({ tab: id }); };
+
+    return {
+      mesLabel: S.monthLabel(mes), prevM: () => this.setState({ mes: S.shiftMonth(mes, -1) }), nextM: () => this.setState({ mes: S.shiftMonth(mes, 1) }),
+      tabs: TABS.map(([id, label, icon]) => ({ label, icon, bg: tab === id ? '#E6175C' : 'transparent', color: tab === id ? '#FFFFFF' : '#4A4E58', onClick: () => setTab(id) })),
+      isCal: tab === 'cal', isRef: tab === 'ref', isPlan: tab === 'plan',
+      onNew: () => go('demandas', 'new:'), contadores,
+      ig, aprovOpts: Object.keys(AP), aprovBg: AP[ig.aprovacao][0], aprovFg: AP[ig.aprovacao][1],
+      onAprov: e => S.setIg(mes, { aprovacao: e.target.value }), onAprovData: e => S.setIg(mes, { aprovadoEm: e.target.value }),
+      hasAviso, aviso: 'O calendário de ' + S.monthLabel(prox) + ' deve ser planejado e apresentado ao cliente até dia 20. Status atual: ' + igProx.aprovacao.toLowerCase() + '.',
+      goProx: () => { setTab('plan'); this.setState({ mes: prox }); },
+      weekDays: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], calDays, semData, semDataVazio: semData.length === 0,
+      hasRef: !!ref, noRef: !ref, ref: ref ? { titulo: ref.titulo, notas: ref.notas.map(([t, d]) => ({ t, d })) } : { notas: [] }, refDays,
+      refLegenda: ref ? ref.legenda.map(([nome, n]) => ({ nome, n, fg: ref.tags[nome][0] })) : [],
+      etapas, etapasFeitas: feitas, etapasPct: Math.round(feitas / 12 * 100) + '%',
+      alinhamento: S.ALINHAMENTO.map(([k, label]) => ({ label, valor: ig.alinhamento[k] || '', onChange: e => S.setIg(mes, { alinhamento: { ...S.igMes(mes).alinhamento, [k]: e.target.value } }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>
